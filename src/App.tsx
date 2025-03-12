@@ -9,6 +9,7 @@ import Vehicles from "./pages/Vehicles";
 import NotFound from "./pages/NotFound";
 import VehicleDetails from "./pages/VehicleDetails";
 import AddVehicle from "./pages/AddVehicle";
+import EditVehicle from "./pages/EditVehicle";
 import Services from "./pages/Services";
 import AddService from "./pages/AddService";
 import ServiceDetails from "./pages/ServiceDetails";
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/vehicles" element={<Vehicles />} />
           <Route path="/vehicles/new" element={<AddVehicle />} />
           <Route path="/vehicles/:id" element={<VehicleDetails />} />
+          <Route path="/vehicles/edit/:id" element={<EditVehicle />} />
           <Route path="/services" element={<Services />} />
           <Route path="/services/new" element={<AddService />} />
           <Route path="/services/:id" element={<ServiceDetails />} />

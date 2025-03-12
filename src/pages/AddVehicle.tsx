@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 import { Vehicle } from '@/lib/types';
+import { addVehicle } from '@/lib/data';
 
 const AddVehicle = () => {
   const navigate = useNavigate();
@@ -12,8 +13,8 @@ const AddVehicle = () => {
 
   const handleSubmit = async (data: Vehicle) => {
     try {
-      // Mock API call - in reality this would be a backend call
-      console.log('New vehicle data:', data);
+      const newVehicle = addVehicle(data);
+      console.log('New vehicle data:', newVehicle);
       toast({
         title: "Sukces!",
         description: "Pojazd został dodany pomyślnie.",

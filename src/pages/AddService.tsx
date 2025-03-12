@@ -37,7 +37,7 @@ const AddService = () => {
           description="Wprowadź informacje o nowym serwisie"
         />
         <div className="max-w-2xl mx-auto">
-          <ServiceForm onSubmit={handleSubmit} />
+          <ServiceForm />
         </div>
       </main>
     </div>

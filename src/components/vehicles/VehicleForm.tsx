@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import TagSelector from "@/components/tags/TagSelector";
 
 interface VehicleFormProps {
   initialVehicle?: Vehicle;
@@ -42,6 +43,7 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
       driverName: '',
       notes: '',
       attachment: '',
+      tags: [],
     }
   );
 
@@ -54,6 +56,10 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
 
   const handleSelectChange = (name: string, value: string) => {
     setVehicle({ ...vehicle, [name]: value });
+  };
+
+  const handleTagChange = (selectedTags: string[]) => {
+    setVehicle({ ...vehicle, tags: selectedTags });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,6 +79,7 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
               id: `v${vehicles.length + 1}`,
             } as Vehicle;
             
+            vehicles.push(newVehicle);
             toast.success('Pojazd został dodany');
           }
           
@@ -191,6 +198,14 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
                 value={vehicle.driverName}
                 onChange={handleChange}
                 placeholder="np. Jan Kowalski"
+              />
+            </div>
+
+            <div>
+              <Label>Tagi</Label>
+              <TagSelector 
+                selectedTags={vehicle.tags || []} 
+                onChange={handleTagChange} 
               />
             </div>
           </div>

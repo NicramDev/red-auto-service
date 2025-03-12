@@ -44,7 +44,7 @@ const Navbar = () => {
           <div className="flex items-center justify-center h-10 w-10 rounded-full bg-brand-600 text-white">
             <Wrench className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold text-brand-600">AutoSerwis</span>
+          <span className="text-xl font-bold text-brand-600">ConsTrack</span>
         </Link>
 
         {/* Desktop Menu */}

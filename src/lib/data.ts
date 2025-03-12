@@ -1,5 +1,12 @@
+import { Vehicle, ServiceRecord, Tag } from "./types";
 
-import { Vehicle, ServiceRecord } from "./types";
+export const tags: Tag[] = [
+  { id: "tag1", name: "Służbowy", color: "#FF5A5A" },
+  { id: "tag2", name: "Prywatny", color: "#5B8FF9" },
+  { id: "tag3", name: "Leasing", color: "#5AD8A6" },
+  { id: "tag4", name: "Wynajem", color: "#F6BD16" },
+  { id: "tag5", name: "Ciężarowy", color: "#8D00E1" },
+];
 
 export const vehicles: Vehicle[] = [
   {
@@ -16,6 +23,7 @@ export const vehicles: Vehicle[] = [
     dateAdded: "2023-01-15",
     lastService: "2023-10-05",
     image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0cb6?q=80&w=2070&auto=format&fit=crop",
+    tags: ["tag1", "tag3"]
   },
   {
     id: "v2",
@@ -31,6 +39,7 @@ export const vehicles: Vehicle[] = [
     dateAdded: "2023-05-20",
     lastService: "2023-11-12",
     image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop",
+    tags: ["tag2"]
   },
   {
     id: "v3",
@@ -45,6 +54,7 @@ export const vehicles: Vehicle[] = [
     transmission: "automatic",
     dateAdded: "2023-07-10",
     image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2071&auto=format&fit=crop",
+    tags: ["tag1", "tag4"]
   },
 ];
 
@@ -103,6 +113,48 @@ export const serviceRecords: ServiceRecord[] = [
     notes: "Everything working properly, software updated to latest version",
   },
 ];
+
+export const addVehicle = (vehicle: Vehicle) => {
+  const newVehicle = {
+    ...vehicle,
+    id: `v${vehicles.length + 1}`,
+    dateAdded: new Date().toISOString().split('T')[0]
+  };
+  vehicles.push(newVehicle);
+  return newVehicle;
+};
+
+export const deleteVehicle = (id: string) => {
+  const index = vehicles.findIndex(v => v.id === id);
+  if (index !== -1) {
+    vehicles.splice(index, 1);
+    return true;
+  }
+  return false;
+};
+
+export const updateVehicle = (updatedVehicle: Vehicle) => {
+  const index = vehicles.findIndex(v => v.id === updatedVehicle.id);
+  if (index !== -1) {
+    vehicles[index] = updatedVehicle;
+    return true;
+  }
+  return false;
+};
+
+export const addTag = (name: string, color: string) => {
+  const newTag = {
+    id: `tag${tags.length + 1}`,
+    name,
+    color
+  };
+  tags.push(newTag);
+  return newTag;
+};
+
+export const getTagById = (id: string): Tag | undefined => {
+  return tags.find(tag => tag.id === id);
+};
 
 export const getVehicleById = (id: string): Vehicle | undefined => {
   return vehicles.find(vehicle => vehicle.id === id);

@@ -1,3 +1,4 @@
+
 export interface Vehicle {
   id: string;
   brand: string;
@@ -20,6 +21,7 @@ export interface Vehicle {
   driverName?: string;
   notes?: string;
   attachment?: string;
+  tags?: string[];
 }
 
 export interface ServiceRecord {
@@ -40,6 +42,12 @@ export interface ServicePart {
   name: string;
   quantity: number;
   price: number;
+}
+
+export interface Tag {
+  id: string;
+  name: string;
+  color: string;
 }
 
 export type FuelType = 'petrol' | 'diesel' | 'electric' | 'hybrid' | 'lpg' | 'other';
