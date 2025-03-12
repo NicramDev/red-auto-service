@@ -9,9 +9,9 @@ import { serviceRecords, vehicles } from '@/lib/data';
 import ServiceCard from '@/components/services/ServiceCard';
 
 const Services = () => {
-  const servicesWithVehicles = serviceRecords.map(service => {
+  const servicesWithVehicles = serviceRecords.map((service, index) => {
     const vehicle = vehicles.find(v => v.id === service.vehicleId);
-    return { ...service, vehicle };
+    return { ...service, vehicle, index };
   });
 
   return (
@@ -32,7 +32,7 @@ const Services = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {servicesWithVehicles.map((service) => (
-            <ServiceCard key={service.id} service={service} vehicle={service.vehicle} />
+            <ServiceCard key={service.id} service={service} vehicle={service.vehicle} index={service.index} />
           ))}
         </div>
       </main>

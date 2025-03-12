@@ -78,6 +78,36 @@ const VehicleDetails = () => {
                     <dt className="text-sm font-medium text-gray-500">Skrzynia biegów</dt>
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.transmission}</dd>
                   </div>
+                  {vehicle.driverName && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Kierowca</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.driverName}</dd>
+                    </div>
+                  )}
+                  {vehicle.purchaseDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Data zakupu</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.purchaseDate}</dd>
+                    </div>
+                  )}
+                  {vehicle.firstRegistrationDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Data pierwszej rejestracji</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.firstRegistrationDate}</dd>
+                    </div>
+                  )}
+                  {vehicle.fuelCardNumber && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Nr karty paliwowej</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.fuelCardNumber}</dd>
+                    </div>
+                  )}
+                  {vehicle.gpsSystemNumber && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Nr systemu GPS</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.gpsSystemNumber}</dd>
+                    </div>
+                  )}
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Ostatni serwis</dt>
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.lastService || 'Brak'}</dd>
@@ -90,8 +120,8 @@ const VehicleDetails = () => {
           <div className="lg:col-span-2">
             <h2 className="text-xl font-semibold mb-4">Historia serwisowa</h2>
             <div className="space-y-4">
-              {services.map((service: ServiceRecord) => (
-                <ServiceCard key={service.id} service={service} vehicle={vehicle} />
+              {services.map((service: ServiceRecord, index: number) => (
+                <ServiceCard key={service.id} service={service} vehicle={vehicle} index={index} />
               ))}
             </div>
           </div>

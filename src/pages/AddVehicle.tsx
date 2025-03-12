@@ -4,12 +4,13 @@ import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import VehicleForm from '@/components/vehicles/VehicleForm';
+import { Vehicle } from '@/lib/types';
 
 const AddVehicle = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: Vehicle) => {
     try {
       // Mock API call - in reality this would be a backend call
       console.log('New vehicle data:', data);

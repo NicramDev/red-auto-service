@@ -1,4 +1,3 @@
-
 export interface Vehicle {
   id: string;
   brand: string;
@@ -13,6 +12,14 @@ export interface Vehicle {
   dateAdded: string;
   lastService?: string;
   image?: string;
+  purchaseDate?: string;
+  firstRegistrationDate?: string;
+  firstInspectionDate?: string;
+  fuelCardNumber?: string;
+  gpsSystemNumber?: string;
+  driverName?: string;
+  notes?: string;
+  attachment?: string;
 }
 
 export interface ServiceRecord {

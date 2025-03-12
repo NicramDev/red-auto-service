@@ -4,12 +4,13 @@ import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import ServiceForm from '@/components/services/ServiceForm';
+import { ServiceRecord } from '@/lib/types';
 
 const AddService = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = async (data: any) => {
+  const handleSubmit = async (data: ServiceRecord) => {
     try {
       // Mock API call - in reality this would be a backend call
       console.log('New service data:', data);

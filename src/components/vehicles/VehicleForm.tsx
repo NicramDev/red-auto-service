@@ -1,8 +1,7 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check } from 'lucide-react';
+import { Check, PaperclipIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { Vehicle, FuelType, TransmissionType } from '@/lib/types';
 import { vehicles } from '@/lib/data';
@@ -17,9 +16,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface VehicleFormProps {
   initialVehicle?: Vehicle;
   isEdit?: boolean;
+  onSubmit?: (data: Vehicle) => Promise<void>;
 }
 
-const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
+const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormProps) => {
   const navigate = useNavigate();
   const [vehicle, setVehicle] = useState<Partial<Vehicle>>(
     initialVehicle || {
@@ -34,6 +34,14 @@ const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
       transmission: 'manual' as TransmissionType,
       dateAdded: new Date().toISOString().split('T')[0],
       image: '',
+      purchaseDate: '',
+      firstRegistrationDate: '',
+      firstInspectionDate: '',
+      fuelCardNumber: '',
+      gpsSystemNumber: '',
+      driverName: '',
+      notes: '',
+      attachment: '',
     }
   );
 
@@ -48,30 +56,34 @@ const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
     setVehicle({ ...vehicle, [name]: value });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      // In a real application, this would be an API call to save the data
-      // For now, just show a success message and navigate back
-
-      if (isEdit && initialVehicle) {
-        toast.success('Pojazd został zaktualizowany');
+    try {
+      if (onSubmit) {
+        await onSubmit(vehicle as Vehicle);
       } else {
-        // Add new vehicle to the list (in a real app, this would be handled by API)
-        const newVehicle = {
-          ...vehicle,
-          id: `v${vehicles.length + 1}`,
-        } as Vehicle;
-        
-        toast.success('Pojazd został dodany');
+        setTimeout(() => {
+          if (isEdit && initialVehicle) {
+            toast.success('Pojazd został zaktualizowany');
+          } else {
+            const newVehicle = {
+              ...vehicle,
+              id: `v${vehicles.length + 1}`,
+            } as Vehicle;
+            
+            toast.success('Pojazd został dodany');
+          }
+          
+          setIsSubmitting(false);
+          navigate('/vehicles');
+        }, 1000);
       }
-
+    } catch (error) {
+      toast.error('Wystąpił błąd podczas zapisywania pojazdu');
       setIsSubmitting(false);
-      navigate('/vehicles');
-    }, 1000);
+    }
   };
 
   return (
@@ -83,6 +95,8 @@ const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-4">
+            <h3 className="text-lg font-medium">Podstawowe informacje</h3>
+            
             <div>
               <Label htmlFor="brand">Marka</Label>
               <Input
@@ -155,9 +169,7 @@ const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
                 placeholder="np. WAUZZZ8K9BA123456"
               />
             </div>
-          </div>
 
-          <div className="space-y-4">
             <div>
               <Label htmlFor="mileage">Przebieg (km)</Label>
               <Input
@@ -171,6 +183,21 @@ const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
               />
             </div>
 
+            <div>
+              <Label htmlFor="driverName">Imię i nazwisko kierowcy</Label>
+              <Input
+                id="driverName"
+                name="driverName"
+                value={vehicle.driverName}
+                onChange={handleChange}
+                placeholder="np. Jan Kowalski"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium">Dane techniczne i terminy</h3>
+            
             <div>
               <Label htmlFor="fuelType">Rodzaj paliwa</Label>
               <Select 
@@ -209,29 +236,110 @@ const VehicleForm = ({ initialVehicle, isEdit = false }: VehicleFormProps) => {
             </div>
 
             <div>
-              <Label htmlFor="image">URL zdjęcia</Label>
+              <Label htmlFor="purchaseDate">Data zakupu pojazdu</Label>
               <Input
-                id="image"
-                name="image"
-                value={vehicle.image}
+                id="purchaseDate"
+                name="purchaseDate"
+                type="date"
+                value={vehicle.purchaseDate}
                 onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
               />
-              {vehicle.image && (
-                <div className="mt-2 rounded-md overflow-hidden h-32 relative">
-                  <img 
-                    src={vehicle.image} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // If image fails to load, clear the URL
-                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Unable+to+load+image';
-                      setVehicle({ ...vehicle, image: '' });
-                    }}
-                  />
-                </div>
-              )}
             </div>
+
+            <div>
+              <Label htmlFor="firstRegistrationDate">Data pierwszej rejestracji</Label>
+              <Input
+                id="firstRegistrationDate"
+                name="firstRegistrationDate"
+                type="date"
+                value={vehicle.firstRegistrationDate}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="firstInspectionDate">Data pierwszego przeglądu</Label>
+              <Input
+                id="firstInspectionDate"
+                name="firstInspectionDate"
+                type="date"
+                value={vehicle.firstInspectionDate}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="fuelCardNumber">Nr karty paliwowej</Label>
+              <Input
+                id="fuelCardNumber"
+                name="fuelCardNumber"
+                value={vehicle.fuelCardNumber}
+                onChange={handleChange}
+                placeholder="np. FC12345"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="gpsSystemNumber">Nr systemu GPS</Label>
+              <Input
+                id="gpsSystemNumber"
+                name="gpsSystemNumber"
+                value={vehicle.gpsSystemNumber}
+                onChange={handleChange}
+                placeholder="np. GPS9876"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Dodatkowe informacje</h3>
+          
+          <div>
+            <Label htmlFor="notes">Notatki</Label>
+            <Textarea
+              id="notes"
+              name="notes"
+              value={vehicle.notes}
+              onChange={handleChange}
+              placeholder="Dodatkowe informacje o pojeździe..."
+              rows={4}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="image">URL zdjęcia</Label>
+            <Input
+              id="image"
+              name="image"
+              value={vehicle.image}
+              onChange={handleChange}
+              placeholder="https://example.com/image.jpg"
+            />
+            {vehicle.image && (
+              <div className="mt-2 rounded-md overflow-hidden h-32 relative">
+                <img 
+                  src={vehicle.image} 
+                  alt="Preview" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Unable+to+load+image';
+                    setVehicle({ ...vehicle, image: '' });
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <Label htmlFor="attachment">Załącznik</Label>
+            <Input
+              id="attachment"
+              name="attachment"
+              value={vehicle.attachment}
+              onChange={handleChange}
+              placeholder="Link do dokumentu lub załącznika"
+            />
           </div>
         </div>
 
