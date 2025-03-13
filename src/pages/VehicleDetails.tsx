@@ -7,7 +7,7 @@ import { getVehicleById, getServicesByVehicleId, getTagById, deleteVehicle } fro
 import { ServiceRecord } from '@/lib/types';
 import ServiceCard from '@/components/services/ServiceCard';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Download, FileText, Pencil, PaperclipIcon, Trash2 } from 'lucide-react';
 import TagBadge from '@/components/tags/TagBadge';
 import { useState } from 'react';
 import {
@@ -20,6 +20,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from '@/components/ui/badge';
 
 const VehicleDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +53,20 @@ const VehicleDetails = () => {
       });
       navigate('/vehicles');
     }
+  };
+
+  const handleViewAttachment = () => {
+    if (vehicle.attachment) {
+      window.open(vehicle.attachment, '_blank');
+    }
+  };
+
+  const getFileIcon = () => {
+    const fileName = vehicle.attachmentName?.toLowerCase() || '';
+    if (fileName.endsWith('.pdf')) return <FileText className="h-4 w-4" />;
+    if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) return <FileText className="h-4 w-4" />;
+    if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx')) return <FileText className="h-4 w-4" />;
+    return <PaperclipIcon className="h-4 w-4" />;
   };
 
   return (
@@ -168,6 +183,25 @@ const VehicleDetails = () => {
                     <dt className="text-sm font-medium text-gray-500">Ostatni serwis</dt>
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.lastService || 'Brak'}</dd>
                   </div>
+                  
+                  {/* Display attachment if available */}
+                  {vehicle.attachment && vehicle.attachmentName && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Załącznik</dt>
+                      <dd className="mt-1">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="mt-1 flex items-center gap-2 w-full justify-start"
+                          onClick={handleViewAttachment}
+                        >
+                          {getFileIcon()}
+                          <span className="truncate max-w-[200px]">{vehicle.attachmentName}</span>
+                          <Download className="h-3 w-3 ml-auto" />
+                        </Button>
+                      </dd>
+                    </div>
+                  )}
                 </dl>
               </div>
             </div>

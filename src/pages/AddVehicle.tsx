@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
@@ -13,6 +12,12 @@ const AddVehicle = () => {
 
   const handleSubmit = async (data: Vehicle) => {
     try {
+      // If we have a file, in a real application we would upload it to a server here
+      // and get back a URL to store in the database
+      
+      // For demonstration purposes, we'll just keep the local object URL
+      // In a real app, you would upload the file to a server and use the returned URL
+      
       const newVehicle = addVehicle(data);
       console.log('New vehicle data:', newVehicle);
       toast({

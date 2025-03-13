@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Check, PaperclipIcon } from 'lucide-react';
+import { Check, PaperclipIcon, Trash2, Upload } from 'lucide-react';
 import { toast } from 'sonner';
 import { Vehicle, FuelType, TransmissionType } from '@/lib/types';
 import { vehicles } from '@/lib/data';
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import TagSelector from "@/components/tags/TagSelector";
+import { Badge } from "@/components/ui/badge";
 
 interface VehicleFormProps {
   initialVehicle?: Vehicle;
@@ -22,6 +23,8 @@ interface VehicleFormProps {
 
 const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormProps) => {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   const [vehicle, setVehicle] = useState<Partial<Vehicle>>(
     initialVehicle || {
       brand: '',
@@ -43,12 +46,14 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
       driverName: '',
       notes: '',
       attachment: '',
+      attachmentFile: null,
+      attachmentName: '',
       tags: [],
     }
   );
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setVehicle({ ...vehicle, [name]: value });
@@ -60,6 +65,45 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
 
   const handleTagChange = (selectedTags: string[]) => {
     setVehicle({ ...vehicle, tags: selectedTags });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const fileName = file.name;
+      
+      const fileUrl = URL.createObjectURL(file);
+      
+      setVehicle({
+        ...vehicle,
+        attachmentFile: file,
+        attachment: fileUrl,
+        attachmentName: fileName
+      });
+      
+      toast.success(`Plik "${fileName}" został dodany`);
+    }
+  };
+
+  const handleRemoveAttachment = () => {
+    setVehicle({
+      ...vehicle,
+      attachment: '',
+      attachmentFile: null,
+      attachmentName: ''
+    });
+    
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
+    toast.info('Załącznik został usunięty');
+  };
+
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -348,13 +392,48 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
 
           <div>
             <Label htmlFor="attachment">Załącznik</Label>
-            <Input
-              id="attachment"
-              name="attachment"
-              value={vehicle.attachment}
-              onChange={handleChange}
-              placeholder="Link do dokumentu lub załącznika"
-            />
+            <div className="mt-1 flex items-center gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={triggerFileInput}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                Wybierz plik
+              </Button>
+              
+              <input 
+                ref={fileInputRef}
+                type="file"
+                id="attachment"
+                className="hidden"
+                onChange={handleFileChange}
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+              />
+              
+              {vehicle.attachmentName && (
+                <div className="flex items-center gap-2 flex-1">
+                  <Badge variant="secondary" className="gap-1 max-w-xs truncate">
+                    <PaperclipIcon className="h-3 w-3" />
+                    <span className="truncate">{vehicle.attachmentName}</span>
+                  </Badge>
+                  <Button 
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-400 hover:text-red-500"
+                    onClick={handleRemoveAttachment}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            <p className="text-xs text-gray-500 mt-1">
+              Dozwolone formaty: PDF, DOC, DOCX, XLS, XLSX, JPG, JPEG, PNG
+            </p>
           </div>
         </div>
 
@@ -390,3 +469,4 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
 };
 
 export default VehicleForm;
+

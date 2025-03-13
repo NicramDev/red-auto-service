@@ -21,6 +21,8 @@ export interface Vehicle {
   driverName?: string;
   notes?: string;
   attachment?: string;
+  attachmentFile?: File | null;
+  attachmentName?: string;
   tags?: string[];
 }
 

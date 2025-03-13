@@ -29,6 +29,9 @@ const EditVehicle = () => {
 
   const handleSubmit = async (data: Vehicle) => {
     try {
+      // In a real app, if a new file was uploaded, you would upload it here
+      // and update the attachment URL before saving to the database
+      
       updateVehicle({
         ...vehicle,
         ...data,
