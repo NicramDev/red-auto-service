@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Wrench, Clock, DollarSign } from 'lucide-react';
@@ -14,7 +13,6 @@ interface ServiceCardProps {
 const ServiceCard = ({ service, vehicle, index }: ServiceCardProps) => {
   if (!vehicle) return null;
   
-  // Format date to display in a nice format
   const formattedDate = new Date(service.date).toLocaleDateString('pl-PL', {
     day: 'numeric',
     month: 'short',
@@ -70,15 +68,25 @@ const ServiceCard = ({ service, vehicle, index }: ServiceCardProps) => {
                 {vehicle.image ? (
                   <img 
                     src={vehicle.image} 
-                    alt={`${vehicle.brand} ${vehicle.model}`} 
+                    alt={`${vehicle.brand} ${vehicle.customName}`} 
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      const imgElem = e.target as HTMLImageElement;
+                      const currentSrc = imgElem.src;
+                      
+                      if (currentSrc.includes('imgur.com') && !currentSrc.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                        imgElem.src = currentSrc + '.jpg';
+                      } else {
+                        imgElem.src = 'https://via.placeholder.com/400x300?text=No+Image';
+                      }
+                    }}
                   />
                 ) : (
                   vehicle.brand.charAt(0)
                 )}
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">{vehicle.brand} {vehicle.model}</h3>
+                <h3 className="font-medium text-gray-900">{vehicle.brand} {vehicle.customName}</h3>
                 <p className="text-sm text-gray-500">{vehicle.licensePlate}</p>
               </div>
             </div>
@@ -107,11 +115,7 @@ const ServiceCard = ({ service, vehicle, index }: ServiceCardProps) => {
             <div className="grid grid-cols-2 gap-3 mt-3">
               <div className="flex items-center gap-1.5 text-sm text-gray-500">
                 <Calendar className="h-4 w-4 text-gray-400" />
-                <span>{formattedDate}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                <Clock className="h-4 w-4 text-gray-400" />
-                <span>{new Intl.NumberFormat('pl-PL').format(service.mileage)} km</span>
+                <span>{formattedDate}{service.time ? ` ${service.time}` : ''}</span>
               </div>
               {service.cost && (
                 <div className="flex items-center gap-1.5 text-sm text-gray-500">
@@ -132,3 +136,4 @@ const ServiceCard = ({ service, vehicle, index }: ServiceCardProps) => {
 };
 
 export default ServiceCard;
+

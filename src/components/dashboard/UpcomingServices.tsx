@@ -100,17 +100,33 @@ const ServiceItem = ({ service, vehicle, index }: ServiceItemProps) => {
             {vehicle.image ? (
               <img 
                 src={vehicle.image} 
-                alt={`${vehicle.brand} ${vehicle.model}`} 
+                alt={`${vehicle.brand} ${vehicle.customName}`} 
                 className="h-full w-full object-cover"
+                onError={(e) => {
+                  const imgElem = e.target as HTMLImageElement;
+                  const currentSrc = imgElem.src;
+                  
+                  if (currentSrc.includes('imgur.com') && !currentSrc.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    imgElem.src = currentSrc + '.jpg';
+                  } else {
+                    imgElem.src = 'https://via.placeholder.com/100x100?text=Auto';
+                  }
+                }}
               />
             ) : (
               vehicle.brand.charAt(0)
             )}
           </div>
           <div>
-            <h3 className="font-medium text-gray-900">{vehicle.brand} {vehicle.model}</h3>
+            <h3 className="font-medium text-gray-900">{vehicle.brand} {vehicle.customName}</h3>
             <div className="text-sm text-gray-500 flex items-center gap-2">
               <span>{formattedDate}</span>
+              {service.time && (
+                <>
+                  <span className="inline-block h-1 w-1 rounded-full bg-gray-300"></span>
+                  <span>godz. {service.time}</span>
+                </>
+              )}
               <span className="inline-block h-1 w-1 rounded-full bg-gray-300"></span>
               <span>{service.description}</span>
             </div>

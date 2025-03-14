@@ -1,6 +1,19 @@
+
 import { Vehicle, ServiceRecord, Tag } from "./types";
 
-export const tags: Tag[] = [
+// Load data from localStorage or use defaults
+const loadFromStorage = <T>(key: string, defaultValue: T): T => {
+  const storedData = localStorage.getItem(key);
+  return storedData ? JSON.parse(storedData) : defaultValue;
+};
+
+// Save data to localStorage
+const saveToStorage = <T>(key: string, data: T): void => {
+  localStorage.setItem(key, JSON.stringify(data));
+};
+
+// Default data
+const defaultTags: Tag[] = [
   { id: "tag1", name: "Służbowy", color: "#FF5A5A" },
   { id: "tag2", name: "Prywatny", color: "#5B8FF9" },
   { id: "tag3", name: "Leasing", color: "#5AD8A6" },
@@ -8,62 +21,67 @@ export const tags: Tag[] = [
   { id: "tag5", name: "Ciężarowy", color: "#8D00E1" },
 ];
 
-export const vehicles: Vehicle[] = [
+const defaultVehicles: Vehicle[] = [
   {
     id: "v1",
     brand: "Audi",
-    model: "A4",
+    customName: "Reprezentacyjne A4",
     year: 2019,
     licensePlate: "WA12345",
     vin: "WAUZZZ8K9BA123456",
     color: "Black",
-    mileage: 45000,
     fuelType: "petrol",
     transmission: "automatic",
     dateAdded: "2023-01-15",
     lastService: "2023-10-05",
     image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0cb6?q=80&w=2070&auto=format&fit=crop",
+    insuranceStartDate: "2023-01-15",
+    insuranceEndDate: "2024-01-14",
+    inspectionStartDate: "2023-02-20",
+    inspectionEndDate: "2024-02-19",
     tags: ["tag1", "tag3"]
   },
   {
     id: "v2",
     brand: "BMW",
-    model: "3 Series",
+    customName: "Seria 3 Biała",
     year: 2021,
     licensePlate: "GD98765",
     vin: "WBA8E9C5XKB123789",
     color: "White",
-    mileage: 15000,
     fuelType: "diesel",
     transmission: "automatic",
     dateAdded: "2023-05-20",
     lastService: "2023-11-12",
     image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop",
+    insuranceStartDate: "2023-05-20",
+    insuranceEndDate: "2024-05-19",
     tags: ["tag2"]
   },
   {
     id: "v3",
     brand: "Tesla",
-    model: "Model 3",
+    customName: "Model 3 Czerwony",
     year: 2022,
     licensePlate: "EL22222",
     vin: "5YJ3E1EAXNF123456",
     color: "Red",
-    mileage: 8000,
     fuelType: "electric",
     transmission: "automatic",
     dateAdded: "2023-07-10",
     image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2071&auto=format&fit=crop",
+    inspectionStartDate: "2023-07-10",
+    inspectionEndDate: "2024-07-09",
     tags: ["tag1", "tag4"]
   },
 ];
 
-export const serviceRecords: ServiceRecord[] = [
+const defaultServiceRecords: ServiceRecord[] = [
   {
     id: "s1",
     vehicleId: "v1",
     date: "2023-10-05",
-    mileage: 45000,
+    time: "10:00",
     description: "Regular maintenance service",
     serviceType: "maintenance",
     status: "completed",
@@ -79,7 +97,7 @@ export const serviceRecords: ServiceRecord[] = [
     id: "s2",
     vehicleId: "v2",
     date: "2023-11-12",
-    mileage: 15000,
+    time: "14:30",
     description: "First scheduled maintenance",
     serviceType: "maintenance",
     status: "completed",
@@ -93,8 +111,8 @@ export const serviceRecords: ServiceRecord[] = [
   {
     id: "s3",
     vehicleId: "v1",
-    date: "2024-02-20",
-    mileage: 48000,
+    date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 6 days from now
+    time: "09:15",
     description: "Brake system repair",
     serviceType: "repair",
     status: "scheduled",
@@ -105,7 +123,7 @@ export const serviceRecords: ServiceRecord[] = [
     id: "s4",
     vehicleId: "v3",
     date: "2024-01-15",
-    mileage: 10000,
+    time: "11:45",
     description: "Battery check and software update",
     serviceType: "inspection",
     status: "completed",
@@ -114,6 +132,12 @@ export const serviceRecords: ServiceRecord[] = [
   },
 ];
 
+// Load or initialize data
+export let tags: Tag[] = loadFromStorage<Tag[]>("constrack_tags", defaultTags);
+export let vehicles: Vehicle[] = loadFromStorage<Vehicle[]>("constrack_vehicles", defaultVehicles);
+export let serviceRecords: ServiceRecord[] = loadFromStorage<ServiceRecord[]>("constrack_services", defaultServiceRecords);
+
+// Functions to manipulate data with persistence
 export const addVehicle = (vehicle: Vehicle) => {
   const newVehicle = {
     ...vehicle,
@@ -121,6 +145,7 @@ export const addVehicle = (vehicle: Vehicle) => {
     dateAdded: new Date().toISOString().split('T')[0]
   };
   vehicles.push(newVehicle);
+  saveToStorage("constrack_vehicles", vehicles);
   return newVehicle;
 };
 
@@ -128,6 +153,11 @@ export const deleteVehicle = (id: string) => {
   const index = vehicles.findIndex(v => v.id === id);
   if (index !== -1) {
     vehicles.splice(index, 1);
+    saveToStorage("constrack_vehicles", vehicles);
+    
+    // Also delete related services
+    serviceRecords = serviceRecords.filter(s => s.vehicleId !== id);
+    saveToStorage("constrack_services", serviceRecords);
     return true;
   }
   return false;
@@ -137,6 +167,7 @@ export const updateVehicle = (updatedVehicle: Vehicle) => {
   const index = vehicles.findIndex(v => v.id === updatedVehicle.id);
   if (index !== -1) {
     vehicles[index] = updatedVehicle;
+    saveToStorage("constrack_vehicles", vehicles);
     return true;
   }
   return false;
@@ -149,7 +180,56 @@ export const addTag = (name: string, color: string) => {
     color
   };
   tags.push(newTag);
+  saveToStorage("constrack_tags", tags);
   return newTag;
+};
+
+export const addService = (service: ServiceRecord) => {
+  const newService = {
+    ...service,
+    id: `s${serviceRecords.length + 1}`,
+  };
+  serviceRecords.push(newService);
+  
+  // Update last service date on the vehicle
+  const vehicleIndex = vehicles.findIndex(v => v.id === service.vehicleId);
+  if (vehicleIndex !== -1) {
+    vehicles[vehicleIndex].lastService = service.date;
+    saveToStorage("constrack_vehicles", vehicles);
+  }
+  
+  saveToStorage("constrack_services", serviceRecords);
+  return newService;
+};
+
+export const updateService = (updatedService: ServiceRecord) => {
+  const index = serviceRecords.findIndex(s => s.id === updatedService.id);
+  if (index !== -1) {
+    serviceRecords[index] = updatedService;
+    saveToStorage("constrack_services", serviceRecords);
+    
+    // Update last service date on the vehicle if status is completed
+    if (updatedService.status === 'completed') {
+      const vehicleIndex = vehicles.findIndex(v => v.id === updatedService.vehicleId);
+      if (vehicleIndex !== -1) {
+        vehicles[vehicleIndex].lastService = updatedService.date;
+        saveToStorage("constrack_vehicles", vehicles);
+      }
+    }
+    
+    return true;
+  }
+  return false;
+};
+
+export const deleteService = (id: string) => {
+  const index = serviceRecords.findIndex(s => s.id === id);
+  if (index !== -1) {
+    serviceRecords.splice(index, 1);
+    saveToStorage("constrack_services", serviceRecords);
+    return true;
+  }
+  return false;
 };
 
 export const getTagById = (id: string): Tag | undefined => {
@@ -172,4 +252,70 @@ export const getUpcomingServices = (): ServiceRecord[] => {
 export const getRecentServices = (): ServiceRecord[] => {
   return serviceRecords.filter(record => record.status === 'completed')
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+};
+
+export const getUpcomingReminders = (): {type: 'service' | 'insurance' | 'inspection', vehicleId: string, date: string, time?: string, daysLeft: number}[] => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const reminders = [];
+  
+  // Check upcoming services (within 7 days)
+  for (const service of serviceRecords) {
+    if (service.status === 'scheduled') {
+      const serviceDate = new Date(service.date);
+      serviceDate.setHours(0, 0, 0, 0);
+      
+      const diffDays = Math.floor((serviceDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays <= 7) {
+        reminders.push({
+          type: 'service',
+          vehicleId: service.vehicleId,
+          date: service.date,
+          time: service.time,
+          daysLeft: diffDays
+        });
+      }
+    }
+  }
+  
+  // Check insurance expiry (within 14 days)
+  for (const vehicle of vehicles) {
+    if (vehicle.insuranceEndDate) {
+      const expiryDate = new Date(vehicle.insuranceEndDate);
+      expiryDate.setHours(0, 0, 0, 0);
+      
+      const diffDays = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays <= 14) {
+        reminders.push({
+          type: 'insurance',
+          vehicleId: vehicle.id,
+          date: vehicle.insuranceEndDate,
+          daysLeft: diffDays
+        });
+      }
+    }
+  }
+  
+  // Check inspection expiry (within 14 days)
+  for (const vehicle of vehicles) {
+    if (vehicle.inspectionEndDate) {
+      const expiryDate = new Date(vehicle.inspectionEndDate);
+      expiryDate.setHours(0, 0, 0, 0);
+      
+      const diffDays = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays <= 14) {
+        reminders.push({
+          type: 'inspection',
+          vehicleId: vehicle.id,
+          date: vehicle.inspectionEndDate,
+          daysLeft: diffDays
+        });
+      }
+    }
+  }
+  
+  return reminders.sort((a, b) => a.daysLeft - b.daysLeft);
 };

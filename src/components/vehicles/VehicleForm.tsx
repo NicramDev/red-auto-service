@@ -28,19 +28,20 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
   const [vehicle, setVehicle] = useState<Partial<Vehicle>>(
     initialVehicle || {
       brand: '',
-      model: '',
+      customName: '',
       year: new Date().getFullYear(),
       licensePlate: '',
       vin: '',
       color: '',
-      mileage: 0,
       fuelType: 'petrol' as FuelType,
       transmission: 'manual' as TransmissionType,
       dateAdded: new Date().toISOString().split('T')[0],
       image: '',
       purchaseDate: '',
-      firstRegistrationDate: '',
-      firstInspectionDate: '',
+      insuranceStartDate: '',
+      insuranceEndDate: '',
+      inspectionStartDate: '',
+      inspectionEndDate: '',
       fuelCardNumber: '',
       gpsSystemNumber: '',
       driverName: '',
@@ -106,9 +107,29 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
     }
   };
 
+  const validateImageUrl = (url: string) => {
+    if (url.includes('imgur.com')) {
+      if (!url.match(/\.(jpeg|jpg|gif|png)$/i)) {
+        if (!url.includes('/a/')) {
+          return url + '.jpg';
+        }
+      }
+    }
+    return url;
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const url = validateImageUrl(e.target.value);
+    setVehicle({ ...vehicle, image: url });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+
+    if (vehicle.image) {
+      vehicle.image = validateImageUrl(vehicle.image);
+    }
 
     try {
       if (onSubmit) {
@@ -116,6 +137,7 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
       } else {
         setTimeout(() => {
           if (isEdit && initialVehicle) {
+            console.log('Vehicle updated:', vehicle);
             toast.success('Pojazd został zaktualizowany');
           } else {
             const newVehicle = {
@@ -124,12 +146,13 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
             } as Vehicle;
             
             vehicles.push(newVehicle);
+            localStorage.setItem('constrack_vehicles', JSON.stringify(vehicles));
             toast.success('Pojazd został dodany');
           }
           
           setIsSubmitting(false);
           navigate('/vehicles');
-        }, 1000);
+        }, 500);
       }
     } catch (error) {
       toast.error('Wystąpił błąd podczas zapisywania pojazdu');
@@ -161,13 +184,13 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
             </div>
 
             <div>
-              <Label htmlFor="model">Model</Label>
+              <Label htmlFor="customName">Nazwa własna</Label>
               <Input
-                id="model"
-                name="model"
-                value={vehicle.model}
+                id="customName"
+                name="customName"
+                value={vehicle.customName}
                 onChange={handleChange}
-                placeholder="np. A4, 3 Series, C-Class"
+                placeholder="np. Auto służbowe CEO, Dostawczy mały"
                 required
               />
             </div>
@@ -218,19 +241,6 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
                 value={vehicle.vin}
                 onChange={handleChange}
                 placeholder="np. WAUZZZ8K9BA123456"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="mileage">Przebieg (km)</Label>
-              <Input
-                id="mileage"
-                name="mileage"
-                type="number"
-                value={vehicle.mileage}
-                onChange={handleChange}
-                min={0}
-                required
               />
             </div>
 
@@ -305,26 +315,50 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
               />
             </div>
 
-            <div>
-              <Label htmlFor="firstRegistrationDate">Data pierwszej rejestracji</Label>
-              <Input
-                id="firstRegistrationDate"
-                name="firstRegistrationDate"
-                type="date"
-                value={vehicle.firstRegistrationDate}
-                onChange={handleChange}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="insuranceStartDate">Data OC/AC od</Label>
+                <Input
+                  id="insuranceStartDate"
+                  name="insuranceStartDate"
+                  type="date"
+                  value={vehicle.insuranceStartDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="insuranceEndDate">Data OC/AC do</Label>
+                <Input
+                  id="insuranceEndDate"
+                  name="insuranceEndDate"
+                  type="date"
+                  value={vehicle.insuranceEndDate}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="firstInspectionDate">Data pierwszego przeglądu</Label>
-              <Input
-                id="firstInspectionDate"
-                name="firstInspectionDate"
-                type="date"
-                value={vehicle.firstInspectionDate}
-                onChange={handleChange}
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="inspectionStartDate">Data ważności przeglądu od</Label>
+                <Input
+                  id="inspectionStartDate"
+                  name="inspectionStartDate"
+                  type="date"
+                  value={vehicle.inspectionStartDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <Label htmlFor="inspectionEndDate">Data ważności przeglądu do</Label>
+                <Input
+                  id="inspectionEndDate"
+                  name="inspectionEndDate"
+                  type="date"
+                  value={vehicle.inspectionEndDate}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div>
@@ -367,13 +401,13 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
           </div>
 
           <div>
-            <Label htmlFor="image">URL zdjęcia</Label>
+            <Label htmlFor="image">URL zdjęcia (obsługuje imgur.com)</Label>
             <Input
               id="image"
               name="image"
               value={vehicle.image}
-              onChange={handleChange}
-              placeholder="https://example.com/image.jpg"
+              onChange={handleImageChange}
+              placeholder="https://imgur.com/abcdef lub https://example.com/image.jpg"
             />
             {vehicle.image && (
               <div className="mt-2 rounded-md overflow-hidden h-32 relative">
@@ -382,8 +416,16 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
                   alt="Preview" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=Unable+to+load+image';
-                    setVehicle({ ...vehicle, image: '' });
+                    console.log('Image load error, trying fallback');
+                    const imgElem = e.target as HTMLImageElement;
+                    const currentSrc = imgElem.src;
+                    
+                    if (currentSrc.includes('imgur.com') && !currentSrc.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                      imgElem.src = currentSrc + '.jpg';
+                    } else {
+                      imgElem.src = 'https://via.placeholder.com/400x300?text=Unable+to+load+image';
+                      setVehicle({ ...vehicle, image: '' });
+                    }
                   }}
                 />
               </div>
@@ -469,4 +511,3 @@ const VehicleForm = ({ initialVehicle, isEdit = false, onSubmit }: VehicleFormPr
 };
 
 export default VehicleForm;
-

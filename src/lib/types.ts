@@ -2,20 +2,21 @@
 export interface Vehicle {
   id: string;
   brand: string;
-  model: string;
+  customName: string;  // Changed from model to customName
   year: number;
   licensePlate: string;
   vin?: string;
   color?: string;
-  mileage: number;
   fuelType: 'petrol' | 'diesel' | 'electric' | 'hybrid' | 'lpg' | 'other';
   transmission: 'manual' | 'automatic' | 'other';
   dateAdded: string;
   lastService?: string;
   image?: string;
   purchaseDate?: string;
-  firstRegistrationDate?: string;
-  firstInspectionDate?: string;
+  insuranceStartDate?: string;  // Changed from firstRegistrationDate
+  insuranceEndDate?: string;    // Added insurance end date
+  inspectionStartDate?: string; // Changed from firstInspectionDate
+  inspectionEndDate?: string;   // Added inspection end date
   fuelCardNumber?: string;
   gpsSystemNumber?: string;
   driverName?: string;
@@ -30,7 +31,7 @@ export interface ServiceRecord {
   id: string;
   vehicleId: string;
   date: string;
-  mileage: number;
+  time?: string;  // Added time field
   description: string;
   serviceType: 'maintenance' | 'repair' | 'inspection' | 'other';
   status: 'scheduled' | 'in-progress' | 'completed' | 'cancelled';

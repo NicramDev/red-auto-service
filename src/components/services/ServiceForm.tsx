@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { Plus, Trash2, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { ServiceRecord, Vehicle, ServiceType, ServiceStatus, ServicePart } from '@/lib/types';
-import { vehicles, serviceRecords } from '@/lib/data';
+import { vehicles, serviceRecords, addService, updateService } from '@/lib/data';
 import { cn } from '@/lib/utils';
 
 import { Button } from "@/components/ui/button";
@@ -18,16 +18,17 @@ interface ServiceFormProps {
   initialService?: ServiceRecord;
   preselectedVehicleId?: string;
   isEdit?: boolean;
+  onSubmit?: (data: ServiceRecord) => Promise<void>;
 }
 
-const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false }: ServiceFormProps) => {
+const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false, onSubmit }: ServiceFormProps) => {
   const navigate = useNavigate();
   
   const [service, setService] = useState<Partial<ServiceRecord>>(
     initialService || {
       vehicleId: preselectedVehicleId || '',
       date: new Date().toISOString().split('T')[0],
-      mileage: 0,
+      time: '09:00', // Default time
       description: '',
       serviceType: 'maintenance' as ServiceType,
       status: 'scheduled' as ServiceStatus,
@@ -79,19 +80,10 @@ const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false }: S
 
   // Select vehicle's current mileage when vehicle is selected
   const handleVehicleChange = (vehicleId: string) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId);
-    if (vehicle) {
-      setService({
-        ...service,
-        vehicleId,
-        mileage: vehicle.mileage,
-      });
-    } else {
-      setService({
-        ...service,
-        vehicleId,
-      });
-    }
+    setService({
+      ...service,
+      vehicleId,
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -104,26 +96,46 @@ const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false }: S
       ...service,
       cost: totalCost,
       parts: parts,
-    };
+    } as ServiceRecord;
 
-    // Simulate API call
-    setTimeout(() => {
-      // In a real application, this would be an API call to save the data
-      if (isEdit && initialService) {
-        toast.success('Serwis został zaktualizowany');
+    // Handle submission
+    try {
+      if (onSubmit) {
+        // Use the provided onSubmit handler
+        onSubmit(updatedService)
+          .then(() => {
+            setIsSubmitting(false);
+            navigate('/services');
+          })
+          .catch(error => {
+            console.error('Error submitting service:', error);
+            setIsSubmitting(false);
+            toast.error('Wystąpił błąd podczas zapisywania serwisu');
+          });
       } else {
-        // Add new service to the list (in a real app, this would be handled by API)
-        const newService = {
-          ...updatedService,
-          id: `s${serviceRecords.length + 1}`,
-        } as ServiceRecord;
-        
-        toast.success('Serwis został dodany');
-      }
+        // Direct data handling
+        setTimeout(() => {
+          if (isEdit && initialService) {
+            updateService({
+              ...initialService,
+              ...updatedService,
+            });
+            toast.success('Serwis został zaktualizowany');
+          } else {
+            // Add new service
+            addService(updatedService);
+            toast.success('Serwis został dodany');
+          }
 
+          setIsSubmitting(false);
+          navigate('/services');
+        }, 500);
+      }
+    } catch (error) {
+      console.error('Error in service form submission:', error);
       setIsSubmitting(false);
-      navigate('/services');
-    }, 1000);
+      toast.error('Wystąpił błąd podczas zapisywania serwisu');
+    }
   };
 
   return (
@@ -148,7 +160,7 @@ const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false }: S
                 <SelectContent>
                   {vehicles.map(vehicle => (
                     <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.brand} {vehicle.model} ({vehicle.licensePlate})
+                      {vehicle.brand} {vehicle.customName} ({vehicle.licensePlate})
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -168,14 +180,13 @@ const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false }: S
                 />
               </div>
               <div>
-                <Label htmlFor="mileage">Przebieg (km)</Label>
+                <Label htmlFor="time">Godzina serwisu</Label>
                 <Input
-                  id="mileage"
-                  name="mileage"
-                  type="number"
-                  value={service.mileage}
+                  id="time"
+                  name="time"
+                  type="time"
+                  value={service.time}
                   onChange={handleChange}
-                  min={0}
                   required
                 />
               </div>
@@ -243,6 +254,7 @@ const ServiceForm = ({ initialService, preselectedVehicleId, isEdit = false }: S
             </div>
           </div>
 
+          {/* Parts section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label>Części i materiały</Label>

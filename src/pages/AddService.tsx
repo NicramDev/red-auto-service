@@ -5,6 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import ServiceForm from '@/components/services/ServiceForm';
 import { ServiceRecord } from '@/lib/types';
+import { addService } from '@/lib/data';
 
 const AddService = () => {
   const navigate = useNavigate();
@@ -12,12 +13,15 @@ const AddService = () => {
 
   const handleSubmit = async (data: ServiceRecord) => {
     try {
-      // Mock API call - in reality this would be a backend call
-      console.log('New service data:', data);
+      // Add new service using the data storage function
+      addService(data);
+      console.log('New service added:', data);
+      
       toast({
         title: "Sukces!",
         description: "Serwis został dodany pomyślnie.",
       });
+      
       navigate('/services');
     } catch (error) {
       toast({

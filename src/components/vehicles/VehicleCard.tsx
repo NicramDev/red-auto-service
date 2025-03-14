@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Droplet, Car, Pencil, Trash2 } from 'lucide-react';
@@ -48,7 +47,7 @@ const VehicleCard = ({ vehicle, index, onDeleted }: VehicleCardProps) => {
 
   const handleDelete = () => {
     deleteVehicle(vehicle.id);
-    toast.success(`Pojazd ${vehicle.brand} ${vehicle.model} został usunięty`);
+    toast.success(`Pojazd ${vehicle.brand} ${vehicle.customName} został usunięty`);
     setDeleteDialogOpen(false);
     if (onDeleted) onDeleted();
   };
@@ -71,21 +70,52 @@ const VehicleCard = ({ vehicle, index, onDeleted }: VehicleCardProps) => {
     'other': 'Inny',
   };
 
+  // Check insurance and inspection dates
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const insuranceEndDate = vehicle.insuranceEndDate ? new Date(vehicle.insuranceEndDate) : null;
+  const inspectionEndDate = vehicle.inspectionEndDate ? new Date(vehicle.inspectionEndDate) : null;
+  
+  const insuranceDaysLeft = insuranceEndDate 
+    ? Math.ceil((insuranceEndDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+    
+  const inspectionDaysLeft = inspectionEndDate
+    ? Math.ceil((inspectionEndDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+    
+  const hasWarnings = (insuranceDaysLeft !== null && insuranceDaysLeft <= 14) || 
+                      (inspectionDaysLeft !== null && inspectionDaysLeft <= 14);
+
   return (
     <>
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.05 }}
-        className="group overflow-hidden rounded-xl glass-light border border-gray-200/50 hover:shadow-md transition-all-300 relative"
+        className={cn(
+          "group overflow-hidden rounded-xl glass-light border border-gray-200/50 hover:shadow-md transition-all-300 relative",
+          hasWarnings && "border-amber-200"
+        )}
       >
         <Link to={`/vehicles/${vehicle.id}`} className="block">
           <div className="relative h-48 overflow-hidden">
             {vehicle.image ? (
               <img 
                 src={vehicle.image} 
-                alt={`${vehicle.brand} ${vehicle.model}`} 
+                alt={`${vehicle.brand} ${vehicle.customName}`} 
                 className="w-full h-full object-cover transition-transform-300 group-hover:scale-105"
+                onError={(e) => {
+                  const imgElem = e.target as HTMLImageElement;
+                  const currentSrc = imgElem.src;
+                  
+                  if (currentSrc.includes('imgur.com') && !currentSrc.match(/\.(jpeg|jpg|gif|png)$/i)) {
+                    imgElem.src = currentSrc + '.jpg';
+                  } else {
+                    imgElem.src = 'https://via.placeholder.com/400x300?text=No+Image+Available';
+                  }
+                }}
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center bg-gray-100">
@@ -94,7 +124,7 @@ const VehicleCard = ({ vehicle, index, onDeleted }: VehicleCardProps) => {
             )}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
               <h3 className="text-white font-bold text-xl">
-                {vehicle.brand} {vehicle.model}
+                {vehicle.brand} {vehicle.customName}
               </h3>
               <p className="text-white/90 text-sm">{vehicle.year} • {vehicle.licensePlate}</p>
             </div>
@@ -106,9 +136,11 @@ const VehicleCard = ({ vehicle, index, onDeleted }: VehicleCardProps) => {
                 {fuelTypeIcons[vehicle.fuelType]}
                 <span className="text-sm text-gray-600">{fuelTypeLabels[vehicle.fuelType]}</span>
               </div>
-              <div className="text-sm text-gray-600">
-                {new Intl.NumberFormat('pl-PL').format(vehicle.mileage)} km
-              </div>
+              {vehicle.driverName && (
+                <div className="text-sm text-gray-600">
+                  Kierowca: {vehicle.driverName}
+                </div>
+              )}
             </div>
             
             {vehicle.tags && vehicle.tags.length > 0 && (
@@ -125,6 +157,29 @@ const VehicleCard = ({ vehicle, index, onDeleted }: VehicleCardProps) => {
               <Calendar className="h-4 w-4" />
               <span>Ostatni serwis: {formattedDate}</span>
             </div>
+
+            {hasWarnings && (
+              <div className="mt-3 pt-3 border-t border-amber-100">
+                {insuranceDaysLeft !== null && insuranceDaysLeft <= 14 && (
+                  <div className="text-amber-600 text-sm flex items-center gap-1.5">
+                    <span className="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
+                    {insuranceDaysLeft <= 0 
+                      ? <span>Ubezpieczenie wygasło!</span>
+                      : <span>Ubezpieczenie wygaśnie za {insuranceDaysLeft} dni</span>
+                    }
+                  </div>
+                )}
+                {inspectionDaysLeft !== null && inspectionDaysLeft <= 14 && (
+                  <div className="text-amber-600 text-sm flex items-center gap-1.5 mt-1">
+                    <span className="inline-block h-2 w-2 rounded-full bg-amber-500"></span>
+                    {inspectionDaysLeft <= 0 
+                      ? <span>Przegląd wygasł!</span>
+                      : <span>Przegląd wygaśnie za {inspectionDaysLeft} dni</span>
+                    }
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </Link>
         
@@ -157,7 +212,7 @@ const VehicleCard = ({ vehicle, index, onDeleted }: VehicleCardProps) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Potwierdzenie usunięcia</AlertDialogTitle>
             <AlertDialogDescription>
-              Czy na pewno chcesz usunąć pojazd {vehicle.brand} {vehicle.model}? 
+              Czy na pewno chcesz usunąć pojazd {vehicle.brand} {vehicle.customName}? 
               Ta operacja jest nieodwracalna.
             </AlertDialogDescription>
           </AlertDialogHeader>

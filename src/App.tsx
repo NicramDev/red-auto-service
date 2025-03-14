@@ -1,41 +1,36 @@
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Dashboard from './pages/Dashboard';
+import Vehicles from './pages/Vehicles';
+import AddVehicle from './pages/AddVehicle';
+import EditVehicle from './pages/EditVehicle';
+import VehicleDetails from './pages/VehicleDetails';
+import Services from './pages/Services';
+import AddService from './pages/AddService';
+import EditService from './pages/EditService';
+import ServiceDetails from './pages/ServiceDetails';
+import Settings from './pages/Settings';
+import { Toaster } from "@/components/ui/toaster"
+import ReminderNotification from "./components/dashboard/ReminderNotification";
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
-import Vehicles from "./pages/Vehicles";
-import NotFound from "./pages/NotFound";
-import VehicleDetails from "./pages/VehicleDetails";
-import AddVehicle from "./pages/AddVehicle";
-import EditVehicle from "./pages/EditVehicle";
-import Services from "./pages/Services";
-import AddService from "./pages/AddService";
-import ServiceDetails from "./pages/ServiceDetails";
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+function App() {
+  return (
+    <Router>
       <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/vehicles" element={<Vehicles />} />
-          <Route path="/vehicles/new" element={<AddVehicle />} />
-          <Route path="/vehicles/:id" element={<VehicleDetails />} />
-          <Route path="/vehicles/edit/:id" element={<EditVehicle />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/services/new" element={<AddService />} />
-          <Route path="/services/:id" element={<ServiceDetails />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+      <ReminderNotification />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/vehicles" element={<Vehicles />} />
+        <Route path="/vehicles/new" element={<AddVehicle />} />
+        <Route path="/vehicles/edit/:id" element={<EditVehicle />} />
+        <Route path="/vehicles/:id" element={<VehicleDetails />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/services/new" element={<AddService />} />
+        <Route path="/services/edit/:id" element={<EditService />} />
+        <Route path="/services/:id" element={<ServiceDetails />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
+    </Router>
+  );
+}
 
 export default App;
