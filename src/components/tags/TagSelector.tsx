@@ -1,24 +1,22 @@
 
 import { useState } from 'react';
-import { Plus, Tag as TagIcon } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { tags, addTag, getTagById } from '@/lib/data';
+import { tags, addTagWithStorage } from '@/lib/data';
+import { v4 as uuidv4 } from 'uuid';
 import TagBadge from './TagBadge';
-import { Tag } from '@/lib/types';
-import { toast } from 'sonner';
 
 interface TagSelectorProps {
   selectedTags: string[];
-  onChange: (tagIds: string[]) => void;
+  onChange: (tags: string[]) => void;
 }
 
 const TagSelector = ({ selectedTags, onChange }: TagSelectorProps) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [newTagName, setNewTagName] = useState('');
-  const [newTagColor, setNewTagColor] = useState('#FF5A5A');
-  
+  const [newTagColor, setNewTagColor] = useState('#3b82f6');
+
   const handleToggleTag = (tagId: string) => {
     if (selectedTags.includes(tagId)) {
       onChange(selectedTags.filter(id => id !== tagId));
@@ -26,90 +24,100 @@ const TagSelector = ({ selectedTags, onChange }: TagSelectorProps) => {
       onChange([...selectedTags, tagId]);
     }
   };
-  
+
   const handleAddNewTag = () => {
     if (newTagName.trim()) {
-      const newTag = addTag(newTagName.trim(), newTagColor);
+      const newTag = {
+        id: uuidv4(),
+        name: newTagName.trim(),
+        color: newTagColor
+      };
+      
+      addTagWithStorage(newTag);
       onChange([...selectedTags, newTag.id]);
+      
+      // Reset form
       setNewTagName('');
-      toast.success(`Dodano nowy tag: ${newTagName}`);
+      setNewTagColor('#3b82f6');
+      setIsAdding(false);
     }
   };
-  
+
   return (
-    <div className="space-y-2">
+    <div>
       <div className="flex flex-wrap gap-2 mb-2">
-        {selectedTags.map(tagId => {
-          const tag = getTagById(tagId);
-          if (!tag) return null;
-          return (
-            <TagBadge 
-              key={tagId} 
-              tag={tag} 
-              removable 
-              onRemove={() => handleToggleTag(tagId)} 
-            />
-          );
-        })}
+        {tags.map(tag => (
+          <button
+            key={tag.id}
+            type="button"
+            onClick={() => handleToggleTag(tag.id)}
+            className={`flex items-center rounded-full px-3 py-1 text-sm ${
+              selectedTags.includes(tag.id) 
+                ? 'ring-2 ring-offset-2 ring-brand-500' 
+                : 'opacity-70 hover:opacity-100'
+            }`}
+          >
+            <TagBadge tag={tag} />
+            {selectedTags.includes(tag.id) && (
+              <X className="ml-1 h-3 w-3" />
+            )}
+          </button>
+        ))}
         
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="h-7 gap-1 rounded-full"
-            >
-              <TagIcon className="h-3.5 w-3.5" />
-              <span>Dodaj tagi</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-4">
-            <h4 className="font-medium mb-2">Wybierz tagi</h4>
-            <div className="space-y-2 mb-4 max-h-40 overflow-y-auto">
-              {tags.map(tag => (
-                <div 
-                  key={tag.id} 
-                  className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
-                  onClick={() => handleToggleTag(tag.id)}
-                >
-                  <TagBadge tag={tag} />
-                  <input 
-                    type="checkbox" 
-                    checked={selectedTags.includes(tag.id)} 
-                    readOnly
-                  />
-                </div>
-              ))}
-            </div>
-            
-            <div className="border-t pt-3">
-              <h4 className="font-medium mb-2">Stwórz nowy tag</h4>
-              <div className="flex gap-2 mb-2">
-                <Input
-                  value={newTagName}
-                  onChange={(e) => setNewTagName(e.target.value)}
-                  placeholder="Nazwa tagu"
-                  className="flex-1"
-                />
-                <input
-                  type="color"
-                  value={newTagColor}
-                  onChange={(e) => setNewTagColor(e.target.value)}
-                  className="h-10 w-10 p-1 border rounded cursor-pointer"
-                />
-              </div>
-              <Button 
-                className="w-full"
-                disabled={!newTagName.trim()}
-                onClick={handleAddNewTag}
-              >
-                <Plus className="h-4 w-4 mr-1" />
-                Dodaj nowy tag
-              </Button>
-            </div>
-          </PopoverContent>
-        </Popover>
+        {!isAdding && (
+          <button
+            type="button"
+            onClick={() => setIsAdding(true)}
+            className="flex items-center gap-1 rounded-full border border-dashed border-gray-300 px-3 py-1 text-sm text-gray-500 hover:border-gray-400 hover:text-gray-700"
+          >
+            <Plus className="h-3 w-3" />
+            Dodaj tag
+          </button>
+        )}
       </div>
+      
+      {isAdding && (
+        <div className="mt-3 p-3 border border-gray-200 rounded-md bg-gray-50">
+          <h4 className="text-sm font-medium mb-2">Nowy tag</h4>
+          <div className="flex items-center gap-2 mb-3">
+            <div className="flex-1">
+              <Input
+                type="text"
+                placeholder="Nazwa tagu"
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Input
+                type="color"
+                value={newTagColor}
+                onChange={(e) => setNewTagColor(e.target.value)}
+                className="w-12 h-9 p-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="sm"
+              onClick={() => setIsAdding(false)}
+            >
+              Anuluj
+            </Button>
+            <Button 
+              type="button" 
+              size="sm"
+              onClick={handleAddNewTag}
+              disabled={!newTagName.trim()}
+            >
+              Dodaj
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

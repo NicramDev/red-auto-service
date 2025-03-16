@@ -1,158 +1,218 @@
 
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Car, Wrench, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Button } from "@/components/ui/button";
+import { Car, Truck, Calendar, Settings, Search, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import Navbar from '@/components/layout/Navbar';
-import PageHeader from '@/components/layout/PageHeader';
-import DashboardStats from '@/components/dashboard/DashboardStats';
-import UpcomingServices from '@/components/dashboard/UpcomingServices';
-import VehicleCard from '@/components/vehicles/VehicleCard';
-import { vehicles, getUpcomingServices, getRecentServices } from '@/lib/data';
+import { vehicles, serviceRecords } from '@/lib/data';
+import { Vehicle, ServiceRecord } from '@/lib/types';
 
 const Index = () => {
-  const upcomingServices = getUpcomingServices();
-  const recentServices = getRecentServices();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredVehicles, setFilteredVehicles] = useState<Vehicle[]>([]);
+  const [upcomingServices, setUpcomingServices] = useState<ServiceRecord[]>([]);
   
-  const totalVehicles = vehicles.length;
-  const scheduledServices = upcomingServices.length;
-  const completedServices = recentServices.length;
-  const criticalAlerts = upcomingServices.filter(
-    service => new Date(service.date) < new Date()
-  ).length;
+  useEffect(() => {
+    // Filter vehicles based on search query
+    const filtered = vehicles.filter(vehicle => 
+      vehicle.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.customName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      vehicle.licensePlate.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredVehicles(filtered);
+    
+    // Get upcoming services
+    const today = new Date();
+    const upcoming = serviceRecords.filter(service => 
+      new Date(service.date) >= today && 
+      service.status !== 'completed'
+    ).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    
+    setUpcomingServices(upcoming.slice(0, 3));
+  }, [searchQuery]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
       <Navbar />
       
-      <main className="container mx-auto px-4 pt-24 pb-12">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <PageHeader
-            title="Dashboard"
-            description="Przegląd twojego serwisu samochodowego"
-          >
-            <Button asChild className="brand-gradient">
-              <Link to="/services/new" className="flex items-center gap-1.5">
-                <Plus className="h-4 w-4" />
-                Dodaj serwis
-              </Link>
-            </Button>
-          </PageHeader>
-        </motion.div>
-
-        <DashboardStats
-          totalVehicles={totalVehicles}
-          scheduledServices={scheduledServices}
-          completedServices={completedServices}
-          criticalAlerts={criticalAlerts}
-        />
+      <main className="container mx-auto px-4 pt-32 pb-20">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-5xl font-bold mb-3">
+            Zarządzanie flotą pojazdów
+          </h1>
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+            Kompleksowe narzędzie do zarządzania flotą, serwisami i dokumentacją pojazdów
+          </p>
+        </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-          <div className="lg:col-span-2">
-            <UpcomingServices services={upcomingServices} vehicles={vehicles} />
+        <div className="max-w-lg mx-auto mb-16">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input 
+              type="text"
+              placeholder="Szukaj pojazdu po marce, nazwie własnej lub nr. rejestracyjnym..."
+              className="pl-10 py-6 bg-gray-800 border-gray-700 text-white rounded-xl"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          
-          <div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+          <Link to="/vehicles">
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.3 }}
-              className="rounded-xl overflow-hidden glass-light border border-gray-200/50"
+              whileHover={{ y: -5 }}
+              className="bg-gradient-to-br from-blue-600 to-blue-700 p-8 rounded-xl text-center cursor-pointer shadow-xl"
             >
-              <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                <div className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-brand-600" />
-                  <h2 className="font-semibold">Twoje pojazdy</h2>
-                </div>
-                <Link to="/vehicles" className="text-sm text-brand-600 hover:text-brand-700">
-                  Zobacz wszystkie
-                </Link>
+              <div className="bg-blue-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Truck className="w-8 h-8" />
               </div>
-              
-              <div className="p-4 space-y-4">
-                {vehicles.slice(0, 2).map((vehicle, index) => (
-                  <Link 
-                    key={vehicle.id} 
-                    to={`/vehicles/${vehicle.id}`}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-all-300"
-                  >
-                    <div className="h-12 w-12 rounded-md bg-gray-100 flex items-center justify-center overflow-hidden">
-                      {vehicle.image ? (
-                        <img 
-                          src={vehicle.image} 
-                          alt={`${vehicle.brand} ${vehicle.model}`} 
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <Car className="h-6 w-6 text-gray-400" />
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="font-medium text-gray-900">{vehicle.brand} {vehicle.model}</h3>
-                      <p className="text-sm text-gray-500">{vehicle.licensePlate}</p>
-                    </div>
+              <h2 className="text-xl font-bold mb-2">Pojazdy</h2>
+              <p className="text-blue-100">Zarządzaj flotą pojazdów, przeglądaj szczegóły i dodawaj nowe</p>
+            </motion.div>
+          </Link>
+          
+          <Link to="/services">
+            <motion.div 
+              whileHover={{ y: -5 }}
+              className="bg-gradient-to-br from-emerald-600 to-emerald-700 p-8 rounded-xl text-center cursor-pointer shadow-xl"
+            >
+              <div className="bg-emerald-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Serwisy</h2>
+              <p className="text-emerald-100">Planuj i śledź serwisy, naprawy i przeglądy pojazdów</p>
+            </motion.div>
+          </Link>
+          
+          <Link to="/settings">
+            <motion.div 
+              whileHover={{ y: -5 }}
+              className="bg-gradient-to-br from-purple-600 to-purple-700 p-8 rounded-xl text-center cursor-pointer shadow-xl"
+            >
+              <div className="bg-purple-500 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Settings className="w-8 h-8" />
+              </div>
+              <h2 className="text-xl font-bold mb-2">Ustawienia</h2>
+              <p className="text-purple-100">Dostosuj aplikację i zarządzaj preferencjami</p>
+            </motion.div>
+          </Link>
+        </div>
+        
+        {searchQuery && (
+          <div className="mb-16">
+            <h2 className="text-2xl font-bold mb-6">Wyniki wyszukiwania</h2>
+            
+            {filteredVehicles.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredVehicles.map(vehicle => (
+                  <Link to={`/vehicles/${vehicle.id}`} key={vehicle.id}>
+                    <motion.div 
+                      whileHover={{ y: -3 }}
+                      className="bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700"
+                    >
+                      <div className="h-48 overflow-hidden">
+                        {vehicle.image ? (
+                          <img 
+                            src={vehicle.image} 
+                            alt={`${vehicle.brand} ${vehicle.customName}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                            <Car className="w-12 h-12 text-gray-500" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4">
+                        <h3 className="text-lg font-bold mb-1">{vehicle.brand} {vehicle.customName}</h3>
+                        <p className="text-gray-400 text-sm">{vehicle.licensePlate}</p>
+                      </div>
+                    </motion.div>
                   </Link>
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-800 rounded-lg">
+                <p>Nie znaleziono pojazdów pasujących do zapytania</p>
+              </div>
+            )}
+          </div>
+        )}
+        
+        <div>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold">Nadchodzące serwisy</h2>
+            <Button asChild variant="outline" className="text-white border-gray-600">
+              <Link to="/services" className="flex items-center gap-1.5">
+                Zobacz wszystkie
+              </Link>
+            </Button>
+          </div>
+          
+          {upcomingServices.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {upcomingServices.map(service => {
+                const vehicle = vehicles.find(v => v.id === service.vehicleId);
                 
-                <Link 
-                  to="/vehicles/new" 
-                  className="flex items-center justify-center gap-1.5 p-3 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:text-brand-600 hover:border-brand-300 transition-all-300"
-                >
-                  <Plus className="h-4 w-4" />
-                  <span>Dodaj pojazd</span>
-                </Link>
-              </div>
-            </motion.div>
-            
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.4 }}
-              className="rounded-xl overflow-hidden glass-light border border-gray-200/50 mt-6"
-            >
-              <div className="flex items-center justify-between p-4 border-b border-gray-100">
-                <div className="flex items-center gap-2">
-                  <Wrench className="h-4 w-4 text-brand-600" />
-                  <h2 className="font-semibold">Ostatnie serwisy</h2>
-                </div>
-              </div>
-              
-              <div className="p-4 space-y-3">
-                {recentServices.slice(0, 3).map((service) => {
-                  const vehicle = vehicles.find(v => v.id === service.vehicleId);
-                  if (!vehicle) return null;
-                  
-                  const formattedDate = new Date(service.date).toLocaleDateString('pl-PL', {
-                    day: 'numeric',
-                    month: 'short'
-                  });
-                  
-                  return (
-                    <Link 
-                      key={service.id} 
-                      to={`/services/${service.id}`}
-                      className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-all-300"
+                if (!vehicle) return null;
+                
+                return (
+                  <Link to={`/services/${service.id}`} key={service.id}>
+                    <motion.div 
+                      whileHover={{ y: -3 }}
+                      className="bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700 p-4"
                     >
-                      <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500">
-                          {vehicle.brand.charAt(0)}
+                      <div className="flex items-start gap-3">
+                        <div className="h-12 w-12 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
+                          {vehicle.image ? (
+                            <img 
+                              src={vehicle.image}
+                              alt={`${vehicle.brand} ${vehicle.customName}`}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <Car className="w-6 h-6 text-gray-500" />
+                          )}
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium">{service.description}</h3>
-                          <p className="text-xs text-gray-500">{vehicle.brand} {vehicle.model}</p>
+                          <h3 className="font-bold mb-1">{vehicle.brand} {vehicle.customName}</h3>
+                          <p className="text-gray-400 text-sm mb-1">{service.date} {service.time && `o ${service.time}`}</p>
+                          <p className="text-sm">{service.description}</p>
                         </div>
                       </div>
-                      <span className="text-xs text-gray-500">{formattedDate}</span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </motion.div>
-          </div>
+                    </motion.div>
+                  </Link>
+                );
+              })}
+              
+              <Link to="/services/new">
+                <motion.div 
+                  whileHover={{ y: -3 }}
+                  className="bg-gray-800 rounded-lg overflow-hidden shadow-lg border border-gray-700 p-4 h-full flex items-center justify-center"
+                >
+                  <div className="text-center">
+                    <div className="mx-auto mb-2 h-12 w-12 rounded-full bg-gray-700 flex items-center justify-center">
+                      <Plus className="w-6 h-6 text-gray-400" />
+                    </div>
+                    <p className="text-gray-400">Dodaj nowy serwis</p>
+                  </div>
+                </motion.div>
+              </Link>
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-gray-800 rounded-lg">
+              <p>Brak nadchodzących serwisów</p>
+              <Button asChild className="mt-4">
+                <Link to="/services/new" className="flex items-center gap-1.5">
+                  <Plus className="h-4 w-4" />
+                  Dodaj serwis
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       </main>
     </div>

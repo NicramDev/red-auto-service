@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import ServiceForm from '@/components/services/ServiceForm';
 import { ServiceRecord } from '@/lib/types';
-import { addService } from '@/lib/data';
+import { addServiceWithStorage } from '@/lib/data';
 
 const AddService = () => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const AddService = () => {
   const handleSubmit = async (data: ServiceRecord) => {
     try {
       // Add new service using the data storage function
-      addService(data);
+      addServiceWithStorage(data);
       console.log('New service added:', data);
       
       toast({

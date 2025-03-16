@@ -1,10 +1,11 @@
+
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 import { Vehicle } from '@/lib/types';
-import { addVehicle } from '@/lib/data';
+import { addVehicleWithStorage } from '@/lib/data';
 
 const AddVehicle = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const AddVehicle = () => {
       // For demonstration purposes, we'll just keep the local object URL
       // In a real app, you would upload the file to a server and use the returned URL
       
-      const newVehicle = addVehicle(data);
+      const newVehicle = addVehicleWithStorage(data);
       console.log('New vehicle data:', newVehicle);
       toast({
         title: "Sukces!",

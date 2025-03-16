@@ -370,7 +370,177 @@ export const getTagById = (id: string): Tag | undefined => {
   return tags.find(tag => tag.id === id);
 };
 
-// Ensure we have a getServiceById function
+// Function to get a service by ID
 export const getServiceById = (id: string) => {
   return serviceRecords.find(service => service.id === id);
 };
+
+// Function to add a new tag
+export const addTag = (tag: Tag): void => {
+  tags.push(tag);
+};
+
+// Function to get upcoming reminders
+export const getUpcomingReminders = () => {
+  const today = new Date();
+  const result = [];
+  
+  // Get upcoming services within next 7 days
+  const upcomingServices = serviceRecords.filter(service => {
+    if (service.status === 'completed') return false;
+    
+    const serviceDate = new Date(service.date);
+    const diffDays = Math.ceil((serviceDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    return diffDays >= 0 && diffDays <= 7;
+  });
+  
+  // Add upcoming services to reminders
+  upcomingServices.forEach(service => {
+    const serviceDate = new Date(service.date);
+    const daysLeft = Math.ceil((serviceDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    
+    result.push({
+      type: 'service',
+      vehicleId: service.vehicleId,
+      serviceId: service.id,
+      date: service.date,
+      time: service.time,
+      description: service.description,
+      daysLeft
+    });
+  });
+  
+  // Check for insurance expiration
+  vehicles.forEach(vehicle => {
+    if (vehicle.insuranceEndDate) {
+      const endDate = new Date(vehicle.insuranceEndDate);
+      const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays <= 7) {
+        result.push({
+          type: 'insurance',
+          vehicleId: vehicle.id,
+          date: vehicle.insuranceEndDate,
+          daysLeft: diffDays
+        });
+      }
+    }
+  });
+  
+  // Check for inspection expiration
+  vehicles.forEach(vehicle => {
+    if (vehicle.inspectionEndDate) {
+      const endDate = new Date(vehicle.inspectionEndDate);
+      const diffDays = Math.ceil((endDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays <= 7) {
+        result.push({
+          type: 'inspection',
+          vehicleId: vehicle.id,
+          date: vehicle.inspectionEndDate,
+          daysLeft: diffDays
+        });
+      }
+    }
+  });
+  
+  // Sort reminders by days left (ascending)
+  return result.sort((a, b) => a.daysLeft - b.daysLeft);
+};
+
+// Implement data persistence using localStorage
+const STORAGE_KEYS = {
+  VEHICLES: 'fleet_manager_vehicles',
+  SERVICES: 'fleet_manager_services',
+  TAGS: 'fleet_manager_tags'
+};
+
+// Load data from localStorage on initial load
+const loadStoredData = () => {
+  try {
+    const storedVehicles = localStorage.getItem(STORAGE_KEYS.VEHICLES);
+    if (storedVehicles) {
+      const parsedVehicles = JSON.parse(storedVehicles);
+      vehicles.length = 0; // Clear existing array
+      vehicles.push(...parsedVehicles);
+    }
+    
+    const storedServices = localStorage.getItem(STORAGE_KEYS.SERVICES);
+    if (storedServices) {
+      const parsedServices = JSON.parse(storedServices);
+      serviceRecords.length = 0; // Clear existing array
+      serviceRecords.push(...parsedServices);
+    }
+    
+    const storedTags = localStorage.getItem(STORAGE_KEYS.TAGS);
+    if (storedTags) {
+      const parsedTags = JSON.parse(storedTags);
+      tags.length = 0; // Clear existing array
+      tags.push(...parsedTags);
+    }
+  } catch (error) {
+    console.error('Error loading data from localStorage:', error);
+  }
+};
+
+// Save data to localStorage
+const saveData = () => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+    localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(serviceRecords));
+    localStorage.setItem(STORAGE_KEYS.TAGS, JSON.stringify(tags));
+  } catch (error) {
+    console.error('Error saving data to localStorage:', error);
+  }
+};
+
+// Override data manipulation functions to save to localStorage
+const originalAddVehicle = addVehicle;
+export const addVehicleWithStorage = (vehicle: Vehicle): Vehicle => {
+  const result = originalAddVehicle(vehicle);
+  saveData();
+  return result;
+};
+
+const originalUpdateVehicle = updateVehicle;
+export const updateVehicleWithStorage = (updatedVehicle: Vehicle): void => {
+  originalUpdateVehicle(updatedVehicle);
+  saveData();
+};
+
+const originalDeleteVehicle = deleteVehicle;
+export const deleteVehicleWithStorage = (id: string): void => {
+  originalDeleteVehicle(id);
+  saveData();
+};
+
+const originalAddService = addService;
+export const addServiceWithStorage = (service: ServiceRecord): void => {
+  originalAddService(service);
+  saveData();
+};
+
+const originalUpdateService = updateService;
+export const updateServiceWithStorage = (updatedService: ServiceRecord): void => {
+  originalUpdateService(updatedService);
+  saveData();
+};
+
+const originalAddTag = addTag;
+export const addTagWithStorage = (tag: Tag): void => {
+  originalAddTag(tag);
+  saveData();
+};
+
+// Initialize data from localStorage
+loadStoredData();
+
+// Replace original functions with storage-enabled versions
+Object.assign(window, { 
+  addVehicle: addVehicleWithStorage,
+  updateVehicle: updateVehicleWithStorage,
+  deleteVehicle: deleteVehicleWithStorage,
+  addService: addServiceWithStorage,
+  updateService: updateServiceWithStorage,
+  addTag: addTagWithStorage
+});

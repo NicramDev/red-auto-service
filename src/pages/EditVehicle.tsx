@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 import { Vehicle } from '@/lib/types';
-import { getVehicleById, updateVehicle } from '@/lib/data';
+import { getVehicleById, updateVehicleWithStorage } from '@/lib/data';
 
 const EditVehicle = () => {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ const EditVehicle = () => {
       // In a real app, if a new file was uploaded, you would upload it here
       // and update the attachment URL before saving to the database
       
-      updateVehicle({
+      updateVehicleWithStorage({
         ...vehicle,
         ...data,
       });
