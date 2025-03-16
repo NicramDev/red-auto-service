@@ -56,7 +56,7 @@ const EditVehicle = () => {
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-12">
         <PageHeader
-          title={`Edytuj: ${vehicle.brand} ${vehicle.model}`}
+          title={`Edytuj: ${vehicle.brand} ${vehicle.customName}`}
           description="Aktualizacja informacji o pojeździe"
         />
         <div className="max-w-2xl mx-auto">
