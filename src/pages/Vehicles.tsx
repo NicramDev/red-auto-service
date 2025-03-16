@@ -25,7 +25,7 @@ const Vehicles = () => {
 
   // Filter vehicles based on search query and tags
   const filteredVehicles = vehicles.filter(vehicle => {
-    const searchString = `${vehicle.brand} ${vehicle.model} ${vehicle.licensePlate}`.toLowerCase();
+    const searchString = `${vehicle.brand} ${vehicle.customName} ${vehicle.licensePlate}`.toLowerCase();
     const matchesSearch = searchString.includes(searchQuery.toLowerCase());
     
     // If no tags are selected, show all vehicles that match the search

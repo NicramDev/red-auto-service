@@ -20,7 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Badge } from '@/components/ui/badge';
 
 const VehicleDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,7 +48,7 @@ const VehicleDetails = () => {
       deleteVehicle(id);
       toast({
         title: "Pojazd usunięty",
-        description: `Pojazd ${vehicle.brand} ${vehicle.model} został usunięty.`,
+        description: `Pojazd ${vehicle.brand} ${vehicle.customName} został usunięty.`,
       });
       navigate('/vehicles');
     }
@@ -74,7 +73,7 @@ const VehicleDetails = () => {
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-12">
         <PageHeader
-          title={`${vehicle.brand} ${vehicle.model}`}
+          title={`${vehicle.brand} ${vehicle.customName}`}
           description={`Szczegóły pojazdu i historia serwisowa`}
         >
           <div className="flex gap-2">
@@ -104,7 +103,7 @@ const VehicleDetails = () => {
                 {vehicle.image ? (
                   <img 
                     src={vehicle.image}
-                    alt={`${vehicle.brand} ${vehicle.model}`}
+                    alt={`${vehicle.brand} ${vehicle.customName}`}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -138,10 +137,6 @@ const VehicleDetails = () => {
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.year}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Przebieg</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{vehicle.mileage} km</dd>
-                  </div>
-                  <div>
                     <dt className="text-sm font-medium text-gray-500">Rodzaj paliwa</dt>
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.fuelType}</dd>
                   </div>
@@ -161,10 +156,28 @@ const VehicleDetails = () => {
                       <dd className="mt-1 text-sm text-gray-900">{vehicle.purchaseDate}</dd>
                     </div>
                   )}
-                  {vehicle.firstRegistrationDate && (
+                  {vehicle.insuranceStartDate && (
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Data pierwszej rejestracji</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{vehicle.firstRegistrationDate}</dd>
+                      <dt className="text-sm font-medium text-gray-500">Data rozpoczęcia ubezpieczenia</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.insuranceStartDate}</dd>
+                    </div>
+                  )}
+                  {vehicle.insuranceEndDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Data zakończenia ubezpieczenia</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.insuranceEndDate}</dd>
+                    </div>
+                  )}
+                  {vehicle.inspectionStartDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Data rozpoczęcia przeglądu</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.inspectionStartDate}</dd>
+                    </div>
+                  )}
+                  {vehicle.inspectionEndDate && (
+                    <div>
+                      <dt className="text-sm font-medium text-gray-500">Data zakończenia przeglądu</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{vehicle.inspectionEndDate}</dd>
                     </div>
                   )}
                   {vehicle.fuelCardNumber && (
@@ -223,7 +236,7 @@ const VehicleDetails = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Potwierdzenie usunięcia</AlertDialogTitle>
             <AlertDialogDescription>
-              Czy na pewno chcesz usunąć pojazd {vehicle.brand} {vehicle.model}? 
+              Czy na pewno chcesz usunąć pojazd {vehicle.brand} {vehicle.customName}? 
               Ta operacja jest nieodwracalna.
             </AlertDialogDescription>
           </AlertDialogHeader>

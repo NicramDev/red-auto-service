@@ -31,13 +31,15 @@ const ServiceDetails = () => {
     year: 'numeric'
   });
 
+  const formattedTime = service.time ? service.time : '';
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-12">
         <PageHeader
           title={`Serwis: ${service.description}`}
-          description={`Data: ${formattedDate}`}
+          description={`Data: ${formattedDate}${formattedTime ? `, Godzina: ${formattedTime}` : ''}`}
         />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -48,15 +50,11 @@ const ServiceDetails = () => {
                 <dl className="space-y-4">
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Pojazd</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{vehicle.brand} {vehicle.model}</dd>
+                    <dd className="mt-1 text-sm text-gray-900">{vehicle.brand} {vehicle.customName}</dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Numer rejestracyjny</dt>
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.licensePlate}</dd>
-                  </div>
-                  <div>
-                    <dt className="text-sm font-medium text-gray-500">Przebieg</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{service.mileage} km</dd>
                   </div>
                 </dl>
               </div>

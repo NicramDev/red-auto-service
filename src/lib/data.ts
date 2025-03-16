@@ -1,321 +1,376 @@
+import { v4 as uuidv4 } from 'uuid';
+import { Vehicle, ServiceRecord, ServicePart, Tag } from './types';
 
-import { Vehicle, ServiceRecord, Tag } from "./types";
-
-// Load data from localStorage or use defaults
-const loadFromStorage = <T>(key: string, defaultValue: T): T => {
-  const storedData = localStorage.getItem(key);
-  return storedData ? JSON.parse(storedData) : defaultValue;
-};
-
-// Save data to localStorage
-const saveToStorage = <T>(key: string, data: T): void => {
-  localStorage.setItem(key, JSON.stringify(data));
-};
-
-// Default data
-const defaultTags: Tag[] = [
-  { id: "tag1", name: "Służbowy", color: "#FF5A5A" },
-  { id: "tag2", name: "Prywatny", color: "#5B8FF9" },
-  { id: "tag3", name: "Leasing", color: "#5AD8A6" },
-  { id: "tag4", name: "Wynajem", color: "#F6BD16" },
-  { id: "tag5", name: "Ciężarowy", color: "#8D00E1" },
-];
-
-const defaultVehicles: Vehicle[] = [
+// Mock data for vehicles
+export const vehicles: Vehicle[] = [
   {
-    id: "v1",
-    brand: "Audi",
-    customName: "Reprezentacyjne A4",
-    year: 2019,
-    licensePlate: "WA12345",
-    vin: "WAUZZZ8K9BA123456",
-    color: "Black",
-    fuelType: "petrol",
-    transmission: "automatic",
-    dateAdded: "2023-01-15",
-    lastService: "2023-10-05",
-    image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0cb6?q=80&w=2070&auto=format&fit=crop",
-    insuranceStartDate: "2023-01-15",
-    insuranceEndDate: "2024-01-14",
-    inspectionStartDate: "2023-02-20",
-    inspectionEndDate: "2024-02-19",
-    tags: ["tag1", "tag3"]
+    id: uuidv4(),
+    brand: 'Mercedes-Benz',
+    customName: 'Actros',
+    year: 2020,
+    licensePlate: 'KR12345',
+    vin: 'WDB1234567890',
+    color: 'White',
+    fuelType: 'diesel',
+    transmission: 'automatic',
+    dateAdded: '2023-01-15',
+    lastService: '2023-12-01',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Mercedes-Benz_Actros_2545_%284th_gen._%2C_since_2018%29_IMG_6757.jpg/640px-Mercedes-Benz_Actros_2545_%284th_gen._%2C_since_2018%29_IMG_6757.jpg',
+    purchaseDate: '2020-02-20',
+    insuranceStartDate: '2023-02-20',
+    insuranceEndDate: '2024-02-20',
+    inspectionStartDate: '2023-03-10',
+    inspectionEndDate: '2024-03-10',
+    fuelCardNumber: '1234-5678-9012-3456',
+    gpsSystemNumber: 'GPS-123',
+    driverName: 'Jan Kowalski',
+    notes: 'Regularly serviced at authorized dealer',
+    attachment: null,
+    attachmentFile: null,
+    attachmentName: null,
+    tags: ['tag1', 'tag2'],
   },
   {
-    id: "v2",
-    brand: "BMW",
-    customName: "Seria 3 Biała",
-    year: 2021,
-    licensePlate: "GD98765",
-    vin: "WBA8E9C5XKB123789",
-    color: "White",
-    fuelType: "diesel",
-    transmission: "automatic",
-    dateAdded: "2023-05-20",
-    lastService: "2023-11-12",
-    image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?q=80&w=2070&auto=format&fit=crop",
-    insuranceStartDate: "2023-05-20",
-    insuranceEndDate: "2024-05-19",
-    tags: ["tag2"]
+    id: uuidv4(),
+    brand: 'MAN',
+    customName: 'TGX 18.480',
+    year: 2018,
+    licensePlate: 'GDA 67890',
+    vin: 'MAN0987654321',
+    color: 'Blue',
+    fuelType: 'diesel',
+    transmission: 'automatic',
+    dateAdded: '2023-03-20',
+    lastService: '2023-11-15',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/MAN_TGX_18.480_BLS_%284th_gen._%2C_since_2020%29_IMG_1787.jpg/640px-MAN_TGX_18.480_BLS_%284th_gen._%2C_since_2020%29_IMG_1787.jpg',
+    purchaseDate: '2018-05-10',
+    insuranceStartDate: '2023-05-10',
+    insuranceEndDate: '2024-05-10',
+    inspectionStartDate: '2023-06-01',
+    inspectionEndDate: '2024-06-01',
+    fuelCardNumber: '9876-5432-1098-7654',
+    gpsSystemNumber: 'GPS-456',
+    driverName: 'Andrzej Nowak',
+    notes: 'Used for international transport',
+    attachment: null,
+    attachmentFile: null,
+    attachmentName: null,
+    tags: ['tag3'],
   },
   {
-    id: "v3",
-    brand: "Tesla",
-    customName: "Model 3 Czerwony",
+    id: uuidv4(),
+    brand: 'Volvo',
+    customName: 'FH 500',
     year: 2022,
-    licensePlate: "EL22222",
-    vin: "5YJ3E1EAXNF123456",
-    color: "Red",
-    fuelType: "electric",
-    transmission: "automatic",
-    dateAdded: "2023-07-10",
-    image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=2071&auto=format&fit=crop",
-    inspectionStartDate: "2023-07-10",
-    inspectionEndDate: "2024-07-09",
-    tags: ["tag1", "tag4"]
+    licensePlate: 'DW 24680',
+    vin: 'VOLVO246813579',
+    color: 'Red',
+    fuelType: 'diesel',
+    transmission: 'automatic',
+    dateAdded: '2023-05-01',
+    lastService: '2024-01-05',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Volvo_FH_500_Globetrotter_XL_%285th_gen._%2C_since_2020%29_IMG_0874.jpg/640px-Volvo_FH_500_Globetrotter_XL_%285th_gen._%2C_since_2020%29_IMG_0874.jpg',
+    purchaseDate: '2022-06-15',
+    insuranceStartDate: '2023-06-15',
+    insuranceEndDate: '2024-06-15',
+    inspectionStartDate: '2023-07-01',
+    inspectionEndDate: '2024-07-01',
+    fuelCardNumber: '1122-3344-5566-7788',
+    gpsSystemNumber: 'GPS-789',
+    driverName: 'Marek Wiśniewski',
+    notes: 'Equipped with advanced safety systems',
+    attachment: null,
+    attachmentFile: null,
+    attachmentName: null,
+    tags: ['tag1', 'tag3'],
+  },
+  {
+    id: uuidv4(),
+    brand: 'Scania',
+    customName: 'R450',
+    year: 2019,
+    licensePlate: 'PO 13579',
+    vin: 'SCANIA975312468',
+    color: 'Green',
+    fuelType: 'diesel',
+    transmission: 'automatic',
+    dateAdded: '2023-07-10',
+    lastService: '2023-10-20',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Scania_R_450_%285th_gen._%2C_since_2016%29_IMG_1047.jpg/640px-Scania_R_450_%285th_gen._%2C_since_2016%29_IMG_1047.jpg',
+    purchaseDate: '2019-08-01',
+    insuranceStartDate: '2023-08-01',
+    insuranceEndDate: '2024-08-01',
+    inspectionStartDate: '2023-09-10',
+    inspectionEndDate: '2024-09-10',
+    fuelCardNumber: '4455-6677-8899-0011',
+    gpsSystemNumber: 'GPS-012',
+    driverName: 'Piotr Zając',
+    notes: 'High roof cabin',
+    attachment: null,
+    attachmentFile: null,
+    attachmentName: null,
+    tags: ['tag2'],
+  },
+  {
+    id: uuidv4(),
+    brand: 'DAF',
+    customName: 'XF 480',
+    year: 2021,
+    licensePlate: 'SL 98765',
+    vin: 'DAF1239874560',
+    color: 'Silver',
+    fuelType: 'diesel',
+    transmission: 'automatic',
+    dateAdded: '2023-09-15',
+    lastService: '2023-11-25',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/DAF_XF_480_FT_%285th_gen._%2C_since_2017%29_IMG_1249.jpg/640px-DAF_XF_480_FT_%285th_gen._%2C_since_2017%29_IMG_1249.jpg',
+    purchaseDate: '2021-10-01',
+    insuranceStartDate: '2023-10-01',
+    insuranceEndDate: '2024-10-01',
+    inspectionStartDate: '2023-11-01',
+    inspectionEndDate: '2024-11-01',
+    fuelCardNumber: '2233-4455-6677-8899',
+    gpsSystemNumber: 'GPS-345',
+    driverName: 'Ewa Lis',
+    notes: 'Economical fuel consumption',
+    attachment: null,
+    attachmentFile: null,
+    attachmentName: null,
+    tags: ['tag1'],
   },
 ];
 
-const defaultServiceRecords: ServiceRecord[] = [
+// Mock data for service records
+export const serviceRecords: ServiceRecord[] = [
   {
-    id: "s1",
-    vehicleId: "v1",
-    date: "2023-10-05",
-    time: "10:00",
-    description: "Regular maintenance service",
-    serviceType: "maintenance",
-    status: "completed",
-    cost: 850,
-    notes: "Changed oil, air filter, and brake pads",
+    id: uuidv4(),
+    vehicleId: vehicles[0].id,
+    date: '2024-01-05',
+    time: '10:00',
+    description: 'Olej i filtry',
+    serviceType: 'maintenance',
+    status: 'completed',
+    cost: 450,
+    notes: 'Standardowy przegląd okresowy',
     parts: [
-      { id: "p1", name: "Oil Filter", quantity: 1, price: 120 },
-      { id: "p2", name: "Air Filter", quantity: 1, price: 95 },
-      { id: "p3", name: "Brake Pads", quantity: 4, price: 450 },
+      { id: uuidv4(), name: 'Olej silnikowy', quantity: 1, price: 150 },
+      { id: uuidv4(), name: 'Filtr oleju', quantity: 1, price: 50 },
+      { id: uuidv4(), name: 'Filtr powietrza', quantity: 1, price: 80 },
     ],
   },
   {
-    id: "s2",
-    vehicleId: "v2",
-    date: "2023-11-12",
-    time: "14:30",
-    description: "First scheduled maintenance",
-    serviceType: "maintenance",
-    status: "completed",
-    cost: 550,
-    notes: "Changed oil and general inspection",
+    id: uuidv4(),
+    vehicleId: vehicles[1].id,
+    date: '2024-01-10',
+    time: '14:30',
+    description: 'Wymiana klocków hamulcowych',
+    serviceType: 'repair',
+    status: 'completed',
+    cost: 600,
+    notes: 'Klocki wymienione na nowe',
     parts: [
-      { id: "p4", name: "Oil Filter", quantity: 1, price: 150 },
-      { id: "p5", name: "Engine Oil", quantity: 1, price: 300 },
+      { id: uuidv4(), name: 'Klocki hamulcowe', quantity: 4, price: 120 },
     ],
   },
   {
-    id: "s3",
-    vehicleId: "v1",
-    date: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 6 days from now
-    time: "09:15",
-    description: "Brake system repair",
-    serviceType: "repair",
-    status: "scheduled",
+    id: uuidv4(),
+    vehicleId: vehicles[2].id,
+    date: '2024-01-15',
+    time: '09:00',
+    description: 'Przegląd techniczny',
+    serviceType: 'inspection',
+    status: 'completed',
+    cost: 200,
+    notes: 'Przegląd przeszedł pomyślnie',
+    parts: [],
+  },
+  {
+    id: uuidv4(),
+    vehicleId: vehicles[3].id,
+    date: '2024-01-20',
+    time: '11:00',
+    description: 'Naprawa klimatyzacji',
+    serviceType: 'repair',
+    status: 'completed',
+    cost: 800,
+    notes: 'Uzupełnienie czynnika chłodniczego',
+    parts: [
+      { id: uuidv4(), name: 'Czynnik chłodniczy', quantity: 1, price: 300 },
+    ],
+  },
+  {
+    id: uuidv4(),
+    vehicleId: vehicles[4].id,
+    date: '2024-01-25',
+    time: '13:00',
+    description: 'Wymiana opon',
+    serviceType: 'maintenance',
+    status: 'completed',
     cost: 1200,
-    notes: "Front brake caliper replacement needed",
+    notes: 'Opony zimowe',
+    parts: [
+      { id: uuidv4(), name: 'Opona zimowa', quantity: 4, price: 300 },
+    ],
   },
   {
-    id: "s4",
-    vehicleId: "v3",
-    date: "2024-01-15",
-    time: "11:45",
-    description: "Battery check and software update",
-    serviceType: "inspection",
-    status: "completed",
-    cost: 100,
-    notes: "Everything working properly, software updated to latest version",
+    id: uuidv4(),
+    vehicleId: vehicles[0].id,
+    date: '2024-02-10',
+    time: '16:00',
+    description: 'Serwis olejowy',
+    serviceType: 'maintenance',
+    status: 'scheduled',
+    cost: 480,
+    notes: 'Wymiana oleju i filtrów',
+    parts: [
+      { id: uuidv4(), name: 'Olej silnikowy', quantity: 1, price: 180 },
+      { id: uuidv4(), name: 'Filtr oleju', quantity: 1, price: 60 },
+      { id: uuidv4(), name: 'Filtr powietrza', quantity: 1, price: 90 },
+    ],
+  },
+  {
+    id: uuidv4(),
+    vehicleId: vehicles[1].id,
+    date: '2024-02-15',
+    time: '08:30',
+    description: 'Kontrola zawieszenia',
+    serviceType: 'inspection',
+    status: 'scheduled',
+    cost: 150,
+    notes: 'Sprawdzenie stanu zawieszenia',
+    parts: [],
+  },
+  {
+    id: uuidv4(),
+    vehicleId: vehicles[2].id,
+    date: '2024-02-20',
+    time: '10:00',
+    description: 'Wymiana rozrządu',
+    serviceType: 'repair',
+    status: 'scheduled',
+    cost: 1500,
+    notes: 'Wymiana kompletnego zestawu rozrządu',
+    parts: [
+      { id: uuidv4(), name: 'Zestaw rozrządu', quantity: 1, price: 1200 },
+      { id: uuidv4(), name: 'Pompa wody', quantity: 1, price: 300 },
+    ],
+  },
+  {
+    id: uuidv4(),
+    vehicleId: vehicles[3].id,
+    date: '2024-02-25',
+    time: '14:00',
+    description: 'Naprawa układu hamulcowego',
+    serviceType: 'repair',
+    status: 'scheduled',
+    cost: 750,
+    notes: 'Wymiana tarcz i klocków hamulcowych',
+    parts: [
+      { id: uuidv4(), name: 'Tarcze hamulcowe', quantity: 2, price: 250 },
+      { id: uuidv4(), name: 'Klocki hamulcowe', quantity: 4, price: 50 },
+    ],
+  },
+  {
+    id: uuidv4(),
+    vehicleId: vehicles[4].id,
+    date: '2024-03-01',
+    time: '12:00',
+    description: 'Przegląd klimatyzacji',
+    serviceType: 'inspection',
+    status: 'scheduled',
+    cost: 300,
+    notes: 'Sprawdzenie szczelności i uzupełnienie czynnika',
+    parts: [],
   },
 ];
 
-// Load or initialize data
-export let tags: Tag[] = loadFromStorage<Tag[]>("constrack_tags", defaultTags);
-export let vehicles: Vehicle[] = loadFromStorage<Vehicle[]>("constrack_vehicles", defaultVehicles);
-export let serviceRecords: ServiceRecord[] = loadFromStorage<ServiceRecord[]>("constrack_services", defaultServiceRecords);
+// Mock data for tags
+export const tags: Tag[] = [
+  {
+    id: 'tag1',
+    name: 'Ciężarowy',
+    color: '#2563eb',
+  },
+  {
+    id: 'tag2',
+    name: 'Chłodnia',
+    color: '#059669',
+  },
+  {
+    id: 'tag3',
+    name: 'Plandeka',
+    color: '#7c3aed',
+  },
+];
 
-// Functions to manipulate data with persistence
-export const addVehicle = (vehicle: Vehicle) => {
-  const newVehicle = {
-    ...vehicle,
-    id: `v${vehicles.length + 1}`,
-    dateAdded: new Date().toISOString().split('T')[0]
-  };
+// Function to add a new vehicle
+export const addVehicle = (vehicle: Vehicle): Vehicle => {
+  const newVehicle: Vehicle = { ...vehicle, id: uuidv4() };
   vehicles.push(newVehicle);
-  saveToStorage("constrack_vehicles", vehicles);
   return newVehicle;
 };
 
-export const deleteVehicle = (id: string) => {
-  const index = vehicles.findIndex(v => v.id === id);
-  if (index !== -1) {
-    vehicles.splice(index, 1);
-    saveToStorage("constrack_vehicles", vehicles);
-    
-    // Also delete related services
-    serviceRecords = serviceRecords.filter(s => s.vehicleId !== id);
-    saveToStorage("constrack_services", serviceRecords);
-    return true;
-  }
-  return false;
-};
-
-export const updateVehicle = (updatedVehicle: Vehicle) => {
-  const index = vehicles.findIndex(v => v.id === updatedVehicle.id);
+// Function to update an existing vehicle
+export const updateVehicle = (updatedVehicle: Vehicle): void => {
+  const index = vehicles.findIndex(vehicle => vehicle.id === updatedVehicle.id);
   if (index !== -1) {
     vehicles[index] = updatedVehicle;
-    saveToStorage("constrack_vehicles", vehicles);
-    return true;
   }
-  return false;
 };
 
-export const addTag = (name: string, color: string) => {
-  const newTag = {
-    id: `tag${tags.length + 1}`,
-    name,
-    color
-  };
-  tags.push(newTag);
-  saveToStorage("constrack_tags", tags);
-  return newTag;
-};
-
-export const addService = (service: ServiceRecord) => {
-  const newService = {
-    ...service,
-    id: `s${serviceRecords.length + 1}`,
-  };
-  serviceRecords.push(newService);
-  
-  // Update last service date on the vehicle
-  const vehicleIndex = vehicles.findIndex(v => v.id === service.vehicleId);
-  if (vehicleIndex !== -1) {
-    vehicles[vehicleIndex].lastService = service.date;
-    saveToStorage("constrack_vehicles", vehicles);
-  }
-  
-  saveToStorage("constrack_services", serviceRecords);
-  return newService;
-};
-
-export const updateService = (updatedService: ServiceRecord) => {
-  const index = serviceRecords.findIndex(s => s.id === updatedService.id);
+// Function to delete a vehicle by ID
+export const deleteVehicle = (id: string): void => {
+  const index = vehicles.findIndex(vehicle => vehicle.id === id);
   if (index !== -1) {
-    serviceRecords[index] = updatedService;
-    saveToStorage("constrack_services", serviceRecords);
-    
-    // Update last service date on the vehicle if status is completed
-    if (updatedService.status === 'completed') {
-      const vehicleIndex = vehicles.findIndex(v => v.id === updatedService.vehicleId);
-      if (vehicleIndex !== -1) {
-        vehicles[vehicleIndex].lastService = updatedService.date;
-        saveToStorage("constrack_vehicles", vehicles);
-      }
-    }
-    
-    return true;
+    vehicles.splice(index, 1);
   }
-  return false;
 };
 
-export const deleteService = (id: string) => {
-  const index = serviceRecords.findIndex(s => s.id === id);
-  if (index !== -1) {
-    serviceRecords.splice(index, 1);
-    saveToStorage("constrack_services", serviceRecords);
-    return true;
-  }
-  return false;
-};
-
-export const getTagById = (id: string): Tag | undefined => {
-  return tags.find(tag => tag.id === id);
-};
-
+// Function to get a vehicle by ID
 export const getVehicleById = (id: string): Vehicle | undefined => {
   return vehicles.find(vehicle => vehicle.id === id);
 };
 
+// Function to add a new service record
+export const addService = (service: ServiceRecord): void => {
+  serviceRecords.push({ ...service, id: uuidv4() });
+};
+
+// Function to update an existing service record
+export const updateService = (updatedService: ServiceRecord): void => {
+  const index = serviceRecords.findIndex(service => service.id === updatedService.id);
+  if (index !== -1) {
+    serviceRecords[index] = updatedService;
+  }
+};
+
+// Function to get services by vehicle ID
 export const getServicesByVehicleId = (vehicleId: string): ServiceRecord[] => {
-  return serviceRecords.filter(record => record.vehicleId === vehicleId);
+  return serviceRecords.filter(service => service.vehicleId === vehicleId);
 };
 
+// Function to get upcoming services
 export const getUpcomingServices = (): ServiceRecord[] => {
-  return serviceRecords.filter(record => record.status === 'scheduled')
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-};
-
-export const getRecentServices = (): ServiceRecord[] => {
-  return serviceRecords.filter(record => record.status === 'completed')
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-};
-
-export const getUpcomingReminders = (): {type: 'service' | 'insurance' | 'inspection', vehicleId: string, date: string, time?: string, daysLeft: number}[] => {
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const reminders = [];
-  
-  // Check upcoming services (within 7 days)
-  for (const service of serviceRecords) {
-    if (service.status === 'scheduled') {
-      const serviceDate = new Date(service.date);
-      serviceDate.setHours(0, 0, 0, 0);
-      
-      const diffDays = Math.floor((serviceDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (diffDays >= 0 && diffDays <= 7) {
-        reminders.push({
-          type: 'service',
-          vehicleId: service.vehicleId,
-          date: service.date,
-          time: service.time,
-          daysLeft: diffDays
-        });
-      }
-    }
-  }
-  
-  // Check insurance expiry (within 14 days)
-  for (const vehicle of vehicles) {
-    if (vehicle.insuranceEndDate) {
-      const expiryDate = new Date(vehicle.insuranceEndDate);
-      expiryDate.setHours(0, 0, 0, 0);
-      
-      const diffDays = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (diffDays >= 0 && diffDays <= 14) {
-        reminders.push({
-          type: 'insurance',
-          vehicleId: vehicle.id,
-          date: vehicle.insuranceEndDate,
-          daysLeft: diffDays
-        });
-      }
-    }
-  }
-  
-  // Check inspection expiry (within 14 days)
-  for (const vehicle of vehicles) {
-    if (vehicle.inspectionEndDate) {
-      const expiryDate = new Date(vehicle.inspectionEndDate);
-      expiryDate.setHours(0, 0, 0, 0);
-      
-      const diffDays = Math.floor((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-      
-      if (diffDays >= 0 && diffDays <= 14) {
-        reminders.push({
-          type: 'inspection',
-          vehicleId: vehicle.id,
-          date: vehicle.inspectionEndDate,
-          daysLeft: diffDays
-        });
-      }
-    }
-  }
-  
-  return reminders.sort((a, b) => a.daysLeft - b.daysLeft);
+  return serviceRecords.filter(
+    service => new Date(service.date) >= today && service.status !== 'completed'
+  );
+};
+
+// Function to get recent services
+export const getRecentServices = (): ServiceRecord[] => {
+  const today = new Date();
+  return serviceRecords.filter(
+    service => new Date(service.date) < today && service.status === 'completed'
+  );
+};
+
+// Function to get a tag by ID
+export const getTagById = (id: string): Tag | undefined => {
+  return tags.find(tag => tag.id === id);
+};
+
+// Ensure we have a getServiceById function
+export const getServiceById = (id: string) => {
+  return serviceRecords.find(service => service.id === id);
 };
