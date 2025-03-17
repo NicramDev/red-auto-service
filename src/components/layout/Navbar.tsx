@@ -1,145 +1,144 @@
 
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Car, Wrench, Home } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Menu, X, Home, Truck, Settings, Tag, Clock, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import useMobile from '@/hooks/use-mobile';
 
 const Navbar = () => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isServicesOpen, setIsServicesOpen] = useState(false);
   const location = useLocation();
-
-  // Handle scroll effect
+  const isMobile = useMobile();
+  
+  // Close the mobile menu when the location changes
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, []);
-
-  // Close mobile menu when route changes
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location.pathname]);
+    setIsOpen(false);
+  }, [location]);
+  
+  // Determine if the current path is active
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
-    <header
-      className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all-300',
-        scrolled 
-          ? 'bg-white/80 backdrop-blur-md shadow-md py-2' 
-          : 'bg-transparent py-4'
-      )}
-    >
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-brand-600 text-white">
-            <Wrench className="h-5 w-5" />
+    <nav className="fixed w-full bg-white/80 backdrop-blur-md shadow-sm z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <span className="text-xl font-bold text-brand-600 tracking-tight">FleetManager</span>
+          </Link>
+          
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-1">
+            <Link to="/dashboard" className={`nav-link ${isActive('/dashboard') ? 'nav-link-active' : ''}`}>
+              <Home className="h-4 w-4 mr-1.5" />
+              <span>Dashboard</span>
+            </Link>
+            
+            <Link to="/vehicles" className={`nav-link ${isActive('/vehicles') ? 'nav-link-active' : ''}`}>
+              <Truck className="h-4 w-4 mr-1.5" />
+              <span>Pojazdy</span>
+            </Link>
+            
+            <div className="relative group">
+              <button 
+                className={`nav-link flex items-center ${isActive('/services') ? 'nav-link-active' : ''}`}
+                onClick={() => setIsServicesOpen(!isServicesOpen)}
+              >
+                <Clock className="h-4 w-4 mr-1.5" />
+                <span>Serwisy</span>
+                <ChevronDown className={`ml-1 h-3 w-3 transform transition-transform ${isServicesOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              <div className="absolute left-0 mt-1 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div className="py-1">
+                  <Link to="/services" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Lista serwisów
+                  </Link>
+                  <Link to="/services/new" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Dodaj serwis
+                  </Link>
+                </div>
+              </div>
+            </div>
+            
+            <Link to="/tags" className={`nav-link ${isActive('/tags') ? 'nav-link-active' : ''}`}>
+              <Tag className="h-4 w-4 mr-1.5" />
+              <span>Tagi</span>
+            </Link>
+            
+            <Link to="/settings" className={`nav-link ${isActive('/settings') ? 'nav-link-active' : ''}`}>
+              <Settings className="h-4 w-4 mr-1.5" />
+              <span>Ustawienia</span>
+            </Link>
           </div>
-          <span className="text-xl font-bold text-brand-600">ConsTrack</span>
-        </Link>
-
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex items-center gap-6">
-          <NavLink to="/" icon={<Home className="h-4 w-4" />} label="Dashboard" />
-          <NavLink to="/vehicles" icon={<Car className="h-4 w-4" />} label="Pojazdy" />
-          <NavLink to="/services" icon={<Wrench className="h-4 w-4" />} label="Serwisy" />
           
-          <Link 
-            to="/vehicles/new" 
-            className="ml-2 px-4 py-2 rounded-full brand-gradient transition-transform-300 hover:shadow-md hover:scale-105"
-          >
-            Dodaj Pojazd
-          </Link>
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden flex items-center justify-center h-10 w-10 rounded-full bg-gray-100"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Menu"
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-5 w-5 text-gray-700" />
-          ) : (
-            <Menu className="h-5 w-5 text-gray-700" />
-          )}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      <div 
-        className={cn(
-          "fixed inset-0 bg-white z-40 pt-20 transition-transform-300 md:hidden",
-          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsOpen(!isOpen)}
+              aria-label="Toggle menu"
+            >
+              {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+        
+        {/* Mobile menu */}
+        {isOpen && (
+          <div className="md:hidden py-2 bg-white border-t">
+            <Link to="/dashboard" className="mobile-nav-link">
+              <Home className="h-5 w-5 mr-2" />
+              <span>Dashboard</span>
+            </Link>
+            
+            <Link to="/vehicles" className="mobile-nav-link">
+              <Truck className="h-5 w-5 mr-2" />
+              <span>Pojazdy</span>
+            </Link>
+            
+            <button 
+              className="mobile-nav-link text-left w-full flex items-center justify-between"
+              onClick={() => setIsServicesOpen(!isServicesOpen)}
+            >
+              <div className="flex items-center">
+                <Clock className="h-5 w-5 mr-2" />
+                <span>Serwisy</span>
+              </div>
+              <ChevronDown className={`h-4 w-4 transform transition-transform ${isServicesOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {isServicesOpen && (
+              <div className="pl-8 bg-gray-50">
+                <Link to="/services" className="mobile-nav-link">
+                  Lista serwisów
+                </Link>
+                <Link to="/services/new" className="mobile-nav-link">
+                  Dodaj serwis
+                </Link>
+              </div>
+            )}
+            
+            <Link to="/tags" className="mobile-nav-link">
+              <Tag className="h-5 w-5 mr-2" />
+              <span>Tagi</span>
+            </Link>
+            
+            <Link to="/settings" className="mobile-nav-link">
+              <Settings className="h-5 w-5 mr-2" />
+              <span>Ustawienia</span>
+            </Link>
+          </div>
         )}
-      >
-        <nav className="flex flex-col p-5 gap-2">
-          <MobileNavLink to="/" icon={<Home className="h-5 w-5" />} label="Dashboard" />
-          <MobileNavLink to="/vehicles" icon={<Car className="h-5 w-5" />} label="Pojazdy" />
-          <MobileNavLink to="/services" icon={<Wrench className="h-5 w-5" />} label="Serwisy" />
-          
-          <Link 
-            to="/vehicles/new" 
-            className="mt-4 py-3 rounded-lg brand-gradient text-center"
-          >
-            Dodaj Pojazd
-          </Link>
-        </nav>
       </div>
-    </header>
-  );
-};
-
-// Desktop Nav Link
-const NavLink = ({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || 
-    (to !== '/' && location.pathname.startsWith(to));
-
-  return (
-    <Link 
-      to={to} 
-      className={cn(
-        "flex items-center gap-1.5 py-1 px-3 rounded-full text-sm font-medium transition-all-300",
-        isActive 
-          ? "bg-brand-50 text-brand-600" 
-          : "text-gray-600 hover:text-brand-600 hover:bg-gray-50"
-      )}
-    >
-      {icon}
-      {label}
-    </Link>
-  );
-};
-
-// Mobile Nav Link
-const MobileNavLink = ({ to, icon, label }: { to: string; icon: React.ReactNode; label: string }) => {
-  const location = useLocation();
-  const isActive = location.pathname === to || 
-    (to !== '/' && location.pathname.startsWith(to));
-
-  return (
-    <Link 
-      to={to} 
-      className={cn(
-        "flex items-center gap-3 py-3 px-4 rounded-lg text-base font-medium transition-all-300",
-        isActive 
-          ? "bg-brand-50 text-brand-600" 
-          : "text-gray-600 hover:bg-gray-100"
-      )}
-    >
-      {icon}
-      {label}
-    </Link>
+    </nav>
   );
 };
 

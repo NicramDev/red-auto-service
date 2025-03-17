@@ -32,6 +32,22 @@ const ServiceDetails = () => {
   });
 
   const formattedTime = service.time ? service.time : '';
+  
+  // Status labels in Polish
+  const statusLabels: Record<string, string> = {
+    'scheduled': 'Zaplanowany',
+    'in-progress': 'W trakcie',
+    'completed': 'Zakończony',
+    'cancelled': 'Anulowany'
+  };
+  
+  // Service type labels in Polish
+  const serviceTypeLabels: Record<string, string> = {
+    'maintenance': 'Przegląd',
+    'repair': 'Naprawa',
+    'inspection': 'Inspekcja',
+    'other': 'Inne'
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -68,11 +84,15 @@ const ServiceDetails = () => {
                 <dl className="space-y-4">
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Typ serwisu</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{service.serviceType}</dd>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {serviceTypeLabels[service.serviceType]}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Status</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{service.status}</dd>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {statusLabels[service.status]}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Opis</dt>
