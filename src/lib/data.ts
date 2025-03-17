@@ -1,3 +1,4 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Vehicle, ServiceRecord, ServicePart, Tag } from './types';
 
@@ -7,6 +8,11 @@ const STORAGE_KEYS = {
   SERVICES: 'fleet_manager_services',
   TAGS: 'fleet_manager_tags'
 };
+
+// Create the actual data stores
+export const vehicles: Vehicle[] = [];
+export const serviceRecords: ServiceRecord[] = [];
+export const tags: Tag[] = [];
 
 // Initial mock data for vehicles (will be overridden by localStorage if available)
 const initialVehicles: Vehicle[] = [
@@ -147,150 +153,6 @@ const initialVehicles: Vehicle[] = [
   },
 ];
 
-// Initial mock data for service records (will be overridden by localStorage if available)
-const initialServiceRecords: ServiceRecord[] = [
-  {
-    id: '1',
-    vehicleId: '1', // This will be updated after loading vehicles
-    date: '2024-01-05',
-    time: '10:00',
-    description: 'Olej i filtry',
-    serviceType: 'maintenance',
-    status: 'completed',
-    cost: 450,
-    notes: 'Standardowy przegląd okresowy',
-    parts: [
-      { id: '1-1', name: 'Olej silnikowy', quantity: 1, price: 150 },
-      { id: '1-2', name: 'Filtr oleju', quantity: 1, price: 50 },
-      { id: '1-3', name: 'Filtr powietrza', quantity: 1, price: 80 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[1].id,
-    date: '2024-01-10',
-    time: '14:30',
-    description: 'Wymiana klocków hamulcowych',
-    serviceType: 'repair',
-    status: 'completed',
-    cost: 600,
-    notes: 'Klocki wymienione na nowe',
-    parts: [
-      { id: uuidv4(), name: 'Klocki hamulcowe', quantity: 4, price: 120 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[2].id,
-    date: '2024-01-15',
-    time: '09:00',
-    description: 'Przegląd techniczny',
-    serviceType: 'inspection',
-    status: 'completed',
-    cost: 200,
-    notes: 'Przegląd przeszedł pomyślnie',
-    parts: [],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[3].id,
-    date: '2024-01-20',
-    time: '11:00',
-    description: 'Naprawa klimatyzacji',
-    serviceType: 'repair',
-    status: 'completed',
-    cost: 800,
-    notes: 'Uzupełnienie czynnika chłodniczego',
-    parts: [
-      { id: uuidv4(), name: 'Czynnik chłodniczy', quantity: 1, price: 300 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[4].id,
-    date: '2024-01-25',
-    time: '13:00',
-    description: 'Wymiana opon',
-    serviceType: 'maintenance',
-    status: 'completed',
-    cost: 1200,
-    notes: 'Opony zimowe',
-    parts: [
-      { id: uuidv4(), name: 'Opona zimowa', quantity: 4, price: 300 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[0].id,
-    date: '2024-02-10',
-    time: '16:00',
-    description: 'Serwis olejowy',
-    serviceType: 'maintenance',
-    status: 'scheduled',
-    cost: 480,
-    notes: 'Wymiana oleju i filtrów',
-    parts: [
-      { id: uuidv4(), name: 'Olej silnikowy', quantity: 1, price: 180 },
-      { id: uuidv4(), name: 'Filtr oleju', quantity: 1, price: 60 },
-      { id: uuidv4(), name: 'Filtr powietrza', quantity: 1, price: 90 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[1].id,
-    date: '2024-02-15',
-    time: '08:30',
-    description: 'Kontrola zawieszenia',
-    serviceType: 'inspection',
-    status: 'scheduled',
-    cost: 150,
-    notes: 'Sprawdzenie stanu zawieszenia',
-    parts: [],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[2].id,
-    date: '2024-02-20',
-    time: '10:00',
-    description: 'Wymiana rozrządu',
-    serviceType: 'repair',
-    status: 'scheduled',
-    cost: 1500,
-    notes: 'Wymiana kompletnego zestawu rozrządu',
-    parts: [
-      { id: uuidv4(), name: 'Zestaw rozrządu', quantity: 1, price: 1200 },
-      { id: uuidv4(), name: 'Pompa wody', quantity: 1, price: 300 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[3].id,
-    date: '2024-02-25',
-    time: '14:00',
-    description: 'Naprawa układu hamulcowego',
-    serviceType: 'repair',
-    status: 'scheduled',
-    cost: 750,
-    notes: 'Wymiana tarcz i klocków hamulcowych',
-    parts: [
-      { id: uuidv4(), name: 'Tarcze hamulcowe', quantity: 2, price: 250 },
-      { id: uuidv4(), name: 'Klocki hamulcowe', quantity: 4, price: 50 },
-    ],
-  },
-  {
-    id: uuidv4(),
-    vehicleId: vehicles[4].id,
-    date: '2024-03-01',
-    time: '12:00',
-    description: 'Przegląd klimatyzacji',
-    serviceType: 'inspection',
-    status: 'scheduled',
-    cost: 300,
-    notes: 'Sprawdzenie szczelności i uzupełnienie czynnika',
-    parts: [],
-  },
-];
-
 // Initial mock data for tags (will be overridden by localStorage if available)
 const initialTags: Tag[] = [
   {
@@ -310,10 +172,27 @@ const initialTags: Tag[] = [
   },
 ];
 
-// Create the actual data stores
-export const vehicles: Vehicle[] = [];
-export const serviceRecords: ServiceRecord[] = [];
-export const tags: Tag[] = [];
+// Initial mock data for service records (will be overridden by localStorage if available)
+const createInitialServiceRecords = () => {
+  return [
+    {
+      id: '1',
+      vehicleId: '1', // This will be updated after loading vehicles
+      date: '2024-01-05',
+      time: '10:00',
+      description: 'Olej i filtry',
+      serviceType: 'maintenance',
+      status: 'completed',
+      cost: 450,
+      notes: 'Standardowy przegląd okresowy',
+      parts: [
+        { id: '1-1', name: 'Olej silnikowy', quantity: 1, price: 150 },
+        { id: '1-2', name: 'Filtr oleju', quantity: 1, price: 50 },
+        { id: '1-3', name: 'Filtr powietrza', quantity: 1, price: 80 },
+      ],
+    },
+  ];
+};
 
 // Load data from localStorage
 const loadStoredData = () => {
@@ -329,25 +208,6 @@ const loadStoredData = () => {
       vehicles.push(...initialVehicles);
     }
     
-    // Load services
-    const storedServices = localStorage.getItem(STORAGE_KEYS.SERVICES);
-    if (storedServices) {
-      const parsedServices = JSON.parse(storedServices);
-      serviceRecords.length = 0;
-      serviceRecords.push(...parsedServices);
-    } else {
-      // If no stored services, use initial data with corrected vehicleIds
-      const servicesWithCorrectIds = initialServiceRecords.map((service, index) => {
-        // Ensure vehicleId references an existing vehicle
-        const vehicleIndex = index % vehicles.length;
-        return {
-          ...service,
-          vehicleId: vehicles[vehicleIndex].id
-        };
-      });
-      serviceRecords.push(...servicesWithCorrectIds);
-    }
-    
     // Load tags
     const storedTags = localStorage.getItem(STORAGE_KEYS.TAGS);
     if (storedTags) {
@@ -359,6 +219,155 @@ const loadStoredData = () => {
       tags.push(...initialTags);
     }
     
+    // Load services
+    const storedServices = localStorage.getItem(STORAGE_KEYS.SERVICES);
+    if (storedServices) {
+      const parsedServices = JSON.parse(storedServices);
+      serviceRecords.length = 0;
+      serviceRecords.push(...parsedServices);
+    } else {
+      // If no stored services, use initial data with corrected vehicleIds
+      const initialServices = createInitialServiceRecords();
+      
+      // Create additional mock service records
+      if (vehicles.length > 0) {
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[1]?.id || vehicles[0].id,
+          date: '2024-01-10',
+          time: '14:30',
+          description: 'Wymiana klocków hamulcowych',
+          serviceType: 'repair',
+          status: 'completed',
+          cost: 600,
+          notes: 'Klocki wymienione na nowe',
+          parts: [
+            { id: uuidv4(), name: 'Klocki hamulcowe', quantity: 4, price: 120 },
+          ],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[2]?.id || vehicles[0].id,
+          date: '2024-01-15',
+          time: '09:00',
+          description: 'Przegląd techniczny',
+          serviceType: 'inspection',
+          status: 'completed',
+          cost: 200,
+          notes: 'Przegląd przeszedł pomyślnie',
+          parts: [],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[3]?.id || vehicles[0].id,
+          date: '2024-01-20',
+          time: '11:00',
+          description: 'Naprawa klimatyzacji',
+          serviceType: 'repair',
+          status: 'completed',
+          cost: 800,
+          notes: 'Uzupełnienie czynnika chłodniczego',
+          parts: [
+            { id: uuidv4(), name: 'Czynnik chłodniczy', quantity: 1, price: 300 },
+          ],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[4]?.id || vehicles[0].id,
+          date: '2024-01-25',
+          time: '13:00',
+          description: 'Wymiana opon',
+          serviceType: 'maintenance',
+          status: 'completed',
+          cost: 1200,
+          notes: 'Opony zimowe',
+          parts: [
+            { id: uuidv4(), name: 'Opona zimowa', quantity: 4, price: 300 },
+          ],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[0].id,
+          date: '2024-02-10',
+          time: '16:00',
+          description: 'Serwis olejowy',
+          serviceType: 'maintenance',
+          status: 'scheduled',
+          cost: 480,
+          notes: 'Wymiana oleju i filtrów',
+          parts: [
+            { id: uuidv4(), name: 'Olej silnikowy', quantity: 1, price: 180 },
+            { id: uuidv4(), name: 'Filtr oleju', quantity: 1, price: 60 },
+            { id: uuidv4(), name: 'Filtr powietrza', quantity: 1, price: 90 },
+          ],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[1]?.id || vehicles[0].id,
+          date: '2024-02-15',
+          time: '08:30',
+          description: 'Kontrola zawieszenia',
+          serviceType: 'inspection',
+          status: 'scheduled',
+          cost: 150,
+          notes: 'Sprawdzenie stanu zawieszenia',
+          parts: [],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[2]?.id || vehicles[0].id,
+          date: '2024-02-20',
+          time: '10:00',
+          description: 'Wymiana rozrządu',
+          serviceType: 'repair',
+          status: 'scheduled',
+          cost: 1500,
+          notes: 'Wymiana kompletnego zestawu rozrządu',
+          parts: [
+            { id: uuidv4(), name: 'Zestaw rozrządu', quantity: 1, price: 1200 },
+            { id: uuidv4(), name: 'Pompa wody', quantity: 1, price: 300 },
+          ],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[3]?.id || vehicles[0].id,
+          date: '2024-02-25',
+          time: '14:00',
+          description: 'Naprawa układu hamulcowego',
+          serviceType: 'repair',
+          status: 'scheduled',
+          cost: 750,
+          notes: 'Wymiana tarcz i klocków hamulcowych',
+          parts: [
+            { id: uuidv4(), name: 'Tarcze hamulcowe', quantity: 2, price: 250 },
+            { id: uuidv4(), name: 'Klocki hamulcowe', quantity: 4, price: 50 },
+          ],
+        });
+        
+        initialServices.push({
+          id: uuidv4(),
+          vehicleId: vehicles[4]?.id || vehicles[0].id,
+          date: '2024-03-01',
+          time: '12:00',
+          description: 'Przegląd klimatyzacji',
+          serviceType: 'inspection',
+          status: 'scheduled',
+          cost: 300,
+          notes: 'Sprawdzenie szczelności i uzupełnienie czynnika',
+          parts: [],
+        });
+      }
+      
+      serviceRecords.push(...initialServices);
+    }
+    
     console.log('Data loaded from localStorage:', {
       vehicles: vehicles.length,
       services: serviceRecords.length,
@@ -368,7 +377,7 @@ const loadStoredData = () => {
     console.error('Error loading data from localStorage:', error);
     // Fall back to initial data
     vehicles.push(...initialVehicles);
-    serviceRecords.push(...initialServiceRecords);
+    serviceRecords.push(...createInitialServiceRecords());
     tags.push(...initialTags);
   }
 };
