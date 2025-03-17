@@ -1,10 +1,17 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Vehicle, ServiceRecord, ServicePart, Tag } from './types';
 
-// Mock data for vehicles
-export const vehicles: Vehicle[] = [
+// Storage keys for localStorage
+const STORAGE_KEYS = {
+  VEHICLES: 'fleet_manager_vehicles',
+  SERVICES: 'fleet_manager_services',
+  TAGS: 'fleet_manager_tags'
+};
+
+// Initial mock data for vehicles (will be overridden by localStorage if available)
+const initialVehicles: Vehicle[] = [
   {
-    id: uuidv4(),
+    id: '1',
     brand: 'Mercedes-Benz',
     customName: 'Actros',
     year: 2020,
@@ -140,11 +147,11 @@ export const vehicles: Vehicle[] = [
   },
 ];
 
-// Mock data for service records
-export const serviceRecords: ServiceRecord[] = [
+// Initial mock data for service records (will be overridden by localStorage if available)
+const initialServiceRecords: ServiceRecord[] = [
   {
-    id: uuidv4(),
-    vehicleId: vehicles[0].id,
+    id: '1',
+    vehicleId: '1', // This will be updated after loading vehicles
     date: '2024-01-05',
     time: '10:00',
     description: 'Olej i filtry',
@@ -153,9 +160,9 @@ export const serviceRecords: ServiceRecord[] = [
     cost: 450,
     notes: 'Standardowy przegląd okresowy',
     parts: [
-      { id: uuidv4(), name: 'Olej silnikowy', quantity: 1, price: 150 },
-      { id: uuidv4(), name: 'Filtr oleju', quantity: 1, price: 50 },
-      { id: uuidv4(), name: 'Filtr powietrza', quantity: 1, price: 80 },
+      { id: '1-1', name: 'Olej silnikowy', quantity: 1, price: 150 },
+      { id: '1-2', name: 'Filtr oleju', quantity: 1, price: 50 },
+      { id: '1-3', name: 'Filtr powietrza', quantity: 1, price: 80 },
     ],
   },
   {
@@ -284,8 +291,8 @@ export const serviceRecords: ServiceRecord[] = [
   },
 ];
 
-// Mock data for tags
-export const tags: Tag[] = [
+// Initial mock data for tags (will be overridden by localStorage if available)
+const initialTags: Tag[] = [
   {
     id: 'tag1',
     name: 'Ciężarowy',
@@ -303,53 +310,181 @@ export const tags: Tag[] = [
   },
 ];
 
-// Function to add a new vehicle
+// Create the actual data stores
+export const vehicles: Vehicle[] = [];
+export const serviceRecords: ServiceRecord[] = [];
+export const tags: Tag[] = [];
+
+// Load data from localStorage
+const loadStoredData = () => {
+  try {
+    // Load vehicles
+    const storedVehicles = localStorage.getItem(STORAGE_KEYS.VEHICLES);
+    if (storedVehicles) {
+      const parsedVehicles = JSON.parse(storedVehicles);
+      vehicles.length = 0; // Clear existing array
+      vehicles.push(...parsedVehicles);
+    } else {
+      // If no stored vehicles, use initial data
+      vehicles.push(...initialVehicles);
+    }
+    
+    // Load services
+    const storedServices = localStorage.getItem(STORAGE_KEYS.SERVICES);
+    if (storedServices) {
+      const parsedServices = JSON.parse(storedServices);
+      serviceRecords.length = 0;
+      serviceRecords.push(...parsedServices);
+    } else {
+      // If no stored services, use initial data with corrected vehicleIds
+      const servicesWithCorrectIds = initialServiceRecords.map((service, index) => {
+        // Ensure vehicleId references an existing vehicle
+        const vehicleIndex = index % vehicles.length;
+        return {
+          ...service,
+          vehicleId: vehicles[vehicleIndex].id
+        };
+      });
+      serviceRecords.push(...servicesWithCorrectIds);
+    }
+    
+    // Load tags
+    const storedTags = localStorage.getItem(STORAGE_KEYS.TAGS);
+    if (storedTags) {
+      const parsedTags = JSON.parse(storedTags);
+      tags.length = 0;
+      tags.push(...parsedTags);
+    } else {
+      // If no stored tags, use initial data
+      tags.push(...initialTags);
+    }
+    
+    console.log('Data loaded from localStorage:', {
+      vehicles: vehicles.length,
+      services: serviceRecords.length,
+      tags: tags.length
+    });
+  } catch (error) {
+    console.error('Error loading data from localStorage:', error);
+    // Fall back to initial data
+    vehicles.push(...initialVehicles);
+    serviceRecords.push(...initialServiceRecords);
+    tags.push(...initialTags);
+  }
+};
+
+// Save data to localStorage
+const saveData = () => {
+  try {
+    localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
+    localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(serviceRecords));
+    localStorage.setItem(STORAGE_KEYS.TAGS, JSON.stringify(tags));
+    console.log('Data saved to localStorage');
+  } catch (error) {
+    console.error('Error saving data to localStorage:', error);
+  }
+};
+
+// Initialize data on module load
+loadStoredData();
+
+// CRUD operations for vehicles with localStorage persistence
 export const addVehicle = (vehicle: Vehicle): Vehicle => {
   const newVehicle: Vehicle = { ...vehicle, id: uuidv4() };
   vehicles.push(newVehicle);
+  saveData();
   return newVehicle;
 };
 
-// Function to update an existing vehicle
 export const updateVehicle = (updatedVehicle: Vehicle): void => {
   const index = vehicles.findIndex(vehicle => vehicle.id === updatedVehicle.id);
   if (index !== -1) {
     vehicles[index] = updatedVehicle;
+    saveData();
   }
 };
 
-// Function to delete a vehicle by ID
 export const deleteVehicle = (id: string): void => {
   const index = vehicles.findIndex(vehicle => vehicle.id === id);
   if (index !== -1) {
     vehicles.splice(index, 1);
+    // Also delete associated services
+    const servicesToDelete = serviceRecords.filter(service => service.vehicleId === id);
+    servicesToDelete.forEach(service => {
+      const serviceIndex = serviceRecords.findIndex(s => s.id === service.id);
+      if (serviceIndex !== -1) {
+        serviceRecords.splice(serviceIndex, 1);
+      }
+    });
+    saveData();
   }
 };
 
-// Function to get a vehicle by ID
 export const getVehicleById = (id: string): Vehicle | undefined => {
   return vehicles.find(vehicle => vehicle.id === id);
 };
 
-// Function to add a new service record
-export const addService = (service: ServiceRecord): void => {
-  serviceRecords.push({ ...service, id: uuidv4() });
+// CRUD operations for service records with localStorage persistence
+export const addService = (service: ServiceRecord): ServiceRecord => {
+  const newService = { ...service, id: uuidv4() };
+  serviceRecords.push(newService);
+  saveData();
+  return newService;
 };
 
-// Function to update an existing service record
 export const updateService = (updatedService: ServiceRecord): void => {
   const index = serviceRecords.findIndex(service => service.id === updatedService.id);
   if (index !== -1) {
     serviceRecords[index] = updatedService;
+    saveData();
   }
 };
 
-// Function to get services by vehicle ID
+export const deleteService = (id: string): void => {
+  const index = serviceRecords.findIndex(service => service.id === id);
+  if (index !== -1) {
+    serviceRecords.splice(index, 1);
+    saveData();
+  }
+};
+
+export const getServiceById = (id: string): ServiceRecord | undefined => {
+  return serviceRecords.find(service => service.id === id);
+};
+
 export const getServicesByVehicleId = (vehicleId: string): ServiceRecord[] => {
   return serviceRecords.filter(service => service.vehicleId === vehicleId);
 };
 
-// Function to get upcoming services
+// Functions for tag management
+export const addTag = (tag: Tag): Tag => {
+  const newTag = { ...tag, id: tag.id || uuidv4() };
+  tags.push(newTag);
+  saveData();
+  return newTag;
+};
+
+export const updateTag = (updatedTag: Tag): void => {
+  const index = tags.findIndex(tag => tag.id === updatedTag.id);
+  if (index !== -1) {
+    tags[index] = updatedTag;
+    saveData();
+  }
+};
+
+export const deleteTag = (id: string): void => {
+  const index = tags.findIndex(tag => tag.id === id);
+  if (index !== -1) {
+    tags.splice(index, 1);
+    saveData();
+  }
+};
+
+export const getTagById = (id: string): Tag | undefined => {
+  return tags.find(tag => tag.id === id);
+};
+
+// Helper functions
 export const getUpcomingServices = (): ServiceRecord[] => {
   const today = new Date();
   return serviceRecords.filter(
@@ -357,7 +492,6 @@ export const getUpcomingServices = (): ServiceRecord[] => {
   );
 };
 
-// Function to get recent services
 export const getRecentServices = (): ServiceRecord[] => {
   const today = new Date();
   return serviceRecords.filter(
@@ -365,22 +499,6 @@ export const getRecentServices = (): ServiceRecord[] => {
   );
 };
 
-// Function to get a tag by ID
-export const getTagById = (id: string): Tag | undefined => {
-  return tags.find(tag => tag.id === id);
-};
-
-// Function to get a service by ID
-export const getServiceById = (id: string) => {
-  return serviceRecords.find(service => service.id === id);
-};
-
-// Function to add a new tag
-export const addTag = (tag: Tag): void => {
-  tags.push(tag);
-};
-
-// Function to get upcoming reminders
 export const getUpcomingReminders = () => {
   const today = new Date();
   const result = [];
@@ -448,99 +566,10 @@ export const getUpcomingReminders = () => {
   return result.sort((a, b) => a.daysLeft - b.daysLeft);
 };
 
-// Implement data persistence using localStorage
-const STORAGE_KEYS = {
-  VEHICLES: 'fleet_manager_vehicles',
-  SERVICES: 'fleet_manager_services',
-  TAGS: 'fleet_manager_tags'
-};
-
-// Load data from localStorage on initial load
-const loadStoredData = () => {
-  try {
-    const storedVehicles = localStorage.getItem(STORAGE_KEYS.VEHICLES);
-    if (storedVehicles) {
-      const parsedVehicles = JSON.parse(storedVehicles);
-      vehicles.length = 0; // Clear existing array
-      vehicles.push(...parsedVehicles);
-    }
-    
-    const storedServices = localStorage.getItem(STORAGE_KEYS.SERVICES);
-    if (storedServices) {
-      const parsedServices = JSON.parse(storedServices);
-      serviceRecords.length = 0; // Clear existing array
-      serviceRecords.push(...parsedServices);
-    }
-    
-    const storedTags = localStorage.getItem(STORAGE_KEYS.TAGS);
-    if (storedTags) {
-      const parsedTags = JSON.parse(storedTags);
-      tags.length = 0; // Clear existing array
-      tags.push(...parsedTags);
-    }
-  } catch (error) {
-    console.error('Error loading data from localStorage:', error);
-  }
-};
-
-// Save data to localStorage
-const saveData = () => {
-  try {
-    localStorage.setItem(STORAGE_KEYS.VEHICLES, JSON.stringify(vehicles));
-    localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(serviceRecords));
-    localStorage.setItem(STORAGE_KEYS.TAGS, JSON.stringify(tags));
-  } catch (error) {
-    console.error('Error saving data to localStorage:', error);
-  }
-};
-
-// Override data manipulation functions to save to localStorage
-const originalAddVehicle = addVehicle;
-export const addVehicleWithStorage = (vehicle: Vehicle): Vehicle => {
-  const result = originalAddVehicle(vehicle);
-  saveData();
-  return result;
-};
-
-const originalUpdateVehicle = updateVehicle;
-export const updateVehicleWithStorage = (updatedVehicle: Vehicle): void => {
-  originalUpdateVehicle(updatedVehicle);
-  saveData();
-};
-
-const originalDeleteVehicle = deleteVehicle;
-export const deleteVehicleWithStorage = (id: string): void => {
-  originalDeleteVehicle(id);
-  saveData();
-};
-
-const originalAddService = addService;
-export const addServiceWithStorage = (service: ServiceRecord): void => {
-  originalAddService(service);
-  saveData();
-};
-
-const originalUpdateService = updateService;
-export const updateServiceWithStorage = (updatedService: ServiceRecord): void => {
-  originalUpdateService(updatedService);
-  saveData();
-};
-
-const originalAddTag = addTag;
-export const addTagWithStorage = (tag: Tag): void => {
-  originalAddTag(tag);
-  saveData();
-};
-
-// Initialize data from localStorage
-loadStoredData();
-
-// Replace original functions with storage-enabled versions
-Object.assign(window, { 
-  addVehicle: addVehicleWithStorage,
-  updateVehicle: updateVehicleWithStorage,
-  deleteVehicle: deleteVehicleWithStorage,
-  addService: addServiceWithStorage,
-  updateService: updateServiceWithStorage,
-  addTag: addTagWithStorage
-});
+// For backward compatibility with existing code, provide these alias functions
+export const addVehicleWithStorage = addVehicle;
+export const updateVehicleWithStorage = updateVehicle;
+export const deleteVehicleWithStorage = deleteVehicle;
+export const addServiceWithStorage = addService;
+export const updateServiceWithStorage = updateService;
+export const addTagWithStorage = addTag;

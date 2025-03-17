@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import VehicleForm from '@/components/vehicles/VehicleForm';
 import { Vehicle } from '@/lib/types';
-import { addVehicleWithStorage } from '@/lib/data';
+import { addVehicle } from '@/lib/data';
 
 const AddVehicle = () => {
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const AddVehicle = () => {
       // For demonstration purposes, we'll just keep the local object URL
       // In a real app, you would upload the file to a server and use the returned URL
       
-      const newVehicle = addVehicleWithStorage(data);
+      const newVehicle = addVehicle(data);
       console.log('New vehicle data:', newVehicle);
       toast({
         title: "Sukces!",

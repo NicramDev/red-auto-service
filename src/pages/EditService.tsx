@@ -5,7 +5,7 @@ import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
 import ServiceForm from '@/components/services/ServiceForm';
 import { ServiceRecord } from '@/lib/types';
-import { getServiceById, updateServiceWithStorage, getVehicleById } from '@/lib/data';
+import { getServiceById, updateService, getVehicleById } from '@/lib/data';
 
 const EditService = () => {
   const navigate = useNavigate();
@@ -30,7 +30,7 @@ const EditService = () => {
 
   const handleSubmit = async (data: ServiceRecord) => {
     try {
-      updateServiceWithStorage({
+      updateService({
         ...service,
         ...data,
       });
