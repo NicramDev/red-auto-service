@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Home, Truck, Settings, Tag, Clock, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import useMobile from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const location = useLocation();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   
   // Close the mobile menu when the location changes
   useEffect(() => {
@@ -25,12 +25,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed w-full bg-white/80 backdrop-blur-md shadow-sm z-50">
+    <nav className="fixed w-full bg-white shadow-sm z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold text-brand-600 tracking-tight">FleetManager</span>
+            <span className="text-xl font-bold text-blue-600 tracking-tight">FleetManager</span>
           </Link>
           
           {/* Desktop Navigation */}

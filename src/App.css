@@ -1,3 +1,4 @@
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -39,4 +40,39 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Old application styles */
+.nav-link {
+  @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900 transition-colors;
+}
+
+.nav-link-active {
+  @apply bg-brand-50 text-brand-600;
+}
+
+.mobile-nav-link {
+  @apply flex items-center px-4 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900;
+}
+
+/* Glass styles */
+.glass-card {
+  @apply bg-white/90 backdrop-blur-sm shadow-sm border border-gray-200 rounded-lg overflow-hidden;
+}
+
+/* Old table styles */
+.old-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.old-table th {
+  @apply px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.old-table td {
+  @apply px-6 py-4 whitespace-nowrap text-sm;
+}
+
+.old-table tr {
+  @apply hover:bg-gray-50;
 }

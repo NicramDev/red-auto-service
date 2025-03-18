@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 0 0% 98%;
     --foreground: 240 10% 3.9%;
 
     --card: 0 0% 100%;
@@ -14,8 +14,8 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 346 84% 50%; /* brand-600 */
-    --primary-foreground: 0 0% 100%;
+    --primary: 221 83% 53%;
+    --primary-foreground: 0 0% 98%;
 
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
@@ -31,18 +31,18 @@
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 346 84% 50%; /* brand-600 */
+    --ring: 221 83% 53%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 346 84% 50%; /* brand-600 */
+    --sidebar-primary: 221 83% 53%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 346 84% 50%; /* brand-600 */
+    --sidebar-ring: 221 83% 53%;
   }
 }
 
@@ -63,11 +63,11 @@
 
 @layer utilities {
   .glass {
-    @apply bg-glass-gradient backdrop-blur-md border border-white/20 shadow-glass;
+    @apply bg-white/80 backdrop-blur-sm border border-gray-200/50 shadow-sm;
   }
   
   .glass-light {
-    @apply bg-white/80 backdrop-blur-sm border border-white/40 shadow-glass-sm;
+    @apply bg-white/90 backdrop-blur-sm border border-gray-100 shadow-sm;
   }
   
   .glass-dark {
@@ -75,11 +75,11 @@
   }
   
   .brand-gradient {
-    @apply bg-red-gradient text-white;
+    @apply bg-blue-gradient text-white;
   }
   
   .text-gradient {
-    @apply bg-red-gradient bg-clip-text text-transparent;
+    @apply bg-blue-gradient bg-clip-text text-transparent;
   }
   
   .animation-delay-100 {

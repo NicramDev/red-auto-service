@@ -41,7 +41,7 @@ function App() {
       });
       localStorage.setItem('hasSeenInstallPrompt', 'true');
     }
-  }, []);
+  }, [toast]);
   
   return (
     <Router>

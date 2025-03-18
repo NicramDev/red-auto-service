@@ -34,7 +34,7 @@ const Index = () => {
   }, [searchQuery]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-800 text-white">
       <Navbar />
       
       <main className="container mx-auto px-4 pt-32 pb-20">
@@ -42,7 +42,7 @@ const Index = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-3">
             Zarządzanie flotą pojazdów
           </h1>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-200 text-lg max-w-2xl mx-auto">
             Kompleksowe narzędzie do zarządzania flotą, serwisami i dokumentacją pojazdów
           </p>
         </div>
