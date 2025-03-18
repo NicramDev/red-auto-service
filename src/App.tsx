@@ -1,12 +1,11 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import PageTransition from './components/ui/PageTransition';
 import { Toaster } from './components/ui/toaster';
 import { useToast } from './hooks/use-toast';
 
 // Pages
-import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import Vehicles from './pages/Vehicles';
 import VehicleDetails from './pages/VehicleDetails';
@@ -19,6 +18,7 @@ import ServiceDetails from './pages/ServiceDetails';
 import NotFound from './pages/NotFound';
 import Settings from './pages/Settings';
 import Tags from './pages/Tags';
+import Index from './pages/Index';
 
 import './App.css';
 
@@ -47,7 +47,8 @@ function App() {
     <Router>
       <PageTransition>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/index" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Vehicle Routes */}

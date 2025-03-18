@@ -64,17 +64,17 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
                 brand: {
-                    50: '#ebf5ff',
-                    100: '#e1effe',
-                    200: '#c3ddfd',
-                    300: '#a4cafe',
-                    400: '#76a9fa',
-                    500: '#3f83f8',
-                    600: '#1c64f2',
-                    700: '#1a56db',
-                    800: '#1e429f',
-                    900: '#233876',
-                    950: '#172554',
+                    50: '#fef2f2',
+                    100: '#fee2e2',
+                    200: '#fecaca',
+                    300: '#fca5a5',
+                    400: '#f87171',
+                    500: '#ef4444',
+                    600: '#dc2626',
+                    700: '#b91c1c',
+                    800: '#991b1b',
+                    900: '#7f1d1d',
+                    950: '#450a0a',
                 },
 			},
 			borderRadius: {
@@ -128,7 +128,7 @@ export default {
             },
             backgroundImage: {
                 'glass-gradient': 'linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05))',
-                'blue-gradient': 'linear-gradient(135deg, #1e429f, #1c64f2)',
+                'red-gradient': 'linear-gradient(135deg, #b91c1c, #dc2626)',
             },
 		}
 	},

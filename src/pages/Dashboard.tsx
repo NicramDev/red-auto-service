@@ -1,6 +1,6 @@
 
 import { Link } from 'react-router-dom';
-import { Car, Wrench, Plus } from 'lucide-react';
+import { Car, Wrench, Plus, PieChart, TrendingUp, Users, Calendar, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import Navbar from '@/components/layout/Navbar';
@@ -64,10 +64,10 @@ const Dashboard = () => {
             >
               <div className="flex items-center justify-between p-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
-                  <Car className="h-4 w-4 text-brand-600" />
+                  <Car className="h-4 w-4 text-red-600" />
                   <h2 className="font-semibold">Twoje pojazdy</h2>
                 </div>
-                <Link to="/vehicles" className="text-sm text-brand-600 hover:text-brand-700">
+                <Link to="/vehicles" className="text-sm text-red-600 hover:text-red-700">
                   Zobacz wszystkie
                 </Link>
               </div>
@@ -99,7 +99,7 @@ const Dashboard = () => {
                 
                 <Link 
                   to="/vehicles/new" 
-                  className="flex items-center justify-center gap-1.5 p-3 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:text-brand-600 hover:border-brand-300 transition-all-300"
+                  className="flex items-center justify-center gap-1.5 p-3 rounded-lg border border-dashed border-gray-300 text-gray-500 hover:text-red-600 hover:border-red-300 transition-all-300"
                 >
                   <Plus className="h-4 w-4" />
                   <span>Dodaj pojazd</span>
@@ -115,7 +115,7 @@ const Dashboard = () => {
             >
               <div className="flex items-center justify-between p-4 border-b border-gray-100">
                 <div className="flex items-center gap-2">
-                  <Wrench className="h-4 w-4 text-brand-600" />
+                  <Wrench className="h-4 w-4 text-red-600" />
                   <h2 className="font-semibold">Ostatnie serwisy</h2>
                 </div>
               </div>
@@ -137,7 +137,7 @@ const Dashboard = () => {
                       className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-all-300"
                     >
                       <div className="flex items-center gap-2">
-                        <div className="h-8 w-8 rounded-full flex items-center justify-center bg-gray-100 text-gray-500">
+                        <div className="h-8 w-8 rounded-full flex items-center justify-center bg-red-100 text-red-500">
                           {vehicle.brand.charAt(0)}
                         </div>
                         <div>

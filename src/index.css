@@ -14,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
 
-    --primary: 221 83% 53%;
+    --primary: 0 84% 49%;
     --primary-foreground: 0 0% 98%;
 
     --secondary: 240 4.8% 95.9%;
@@ -31,18 +31,18 @@
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 221 83% 53%;
+    --ring: 0 84% 49%;
 
     --radius: 0.5rem;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 10% 3.9%;
-    --sidebar-primary: 221 83% 53%;
+    --sidebar-primary: 0 84% 49%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4.8% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 240 5.9% 90%;
-    --sidebar-ring: 221 83% 53%;
+    --sidebar-ring: 0 84% 49%;
   }
 }
 
@@ -75,11 +75,11 @@
   }
   
   .brand-gradient {
-    @apply bg-blue-gradient text-white;
+    @apply bg-red-gradient text-white;
   }
   
   .text-gradient {
-    @apply bg-blue-gradient bg-clip-text text-transparent;
+    @apply bg-red-gradient bg-clip-text text-transparent;
   }
   
   .animation-delay-100 {

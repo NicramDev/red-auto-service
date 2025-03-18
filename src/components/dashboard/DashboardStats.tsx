@@ -1,5 +1,5 @@
 
-import { Car, Car as CarIcon, Wrench, Calendar, AlertCircle } from 'lucide-react';
+import { Car, Wrench, Calendar, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 
@@ -52,7 +52,7 @@ export const StatCard = ({
             </div>
           )}
         </div>
-        <div className="h-10 w-10 rounded-full flex items-center justify-center bg-brand-50 text-brand-600">
+        <div className="h-10 w-10 rounded-full flex items-center justify-center bg-red-50 text-red-600">
           {icon}
         </div>
       </div>
@@ -103,7 +103,7 @@ const DashboardStats = ({
         icon={<AlertCircle className="h-5 w-5" />}
         trend={criticalAlerts > 0 ? 'up' : 'neutral'}
         trendValue={criticalAlerts > 0 ? 'Sprawdź' : 'Brak'}
-        className={criticalAlerts > 0 ? "border-orange-200 bg-orange-50/50" : ""}
+        className={criticalAlerts > 0 ? "border-red-200 bg-red-50/50" : ""}
         delay={3}
       />
     </div>

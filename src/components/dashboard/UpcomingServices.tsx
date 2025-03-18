@@ -26,10 +26,10 @@ const UpcomingServices = ({ services, vehicles }: UpcomingServicesProps) => {
     >
       <div className="flex items-center justify-between p-4 border-b border-gray-100">
         <div className="flex items-center gap-2">
-          <Calendar className="h-4 w-4 text-brand-600" />
+          <Calendar className="h-4 w-4 text-red-600" />
           <h2 className="font-semibold">Nadchodzące serwisy</h2>
         </div>
-        <Link to="/services" className="text-sm text-brand-600 hover:text-brand-700 flex items-center">
+        <Link to="/services" className="text-sm text-red-600 hover:text-red-700 flex items-center">
           Zobacz wszystkie <ChevronRight className="h-4 w-4 ml-1" />
         </Link>
       </div>
@@ -47,7 +47,7 @@ const UpcomingServices = ({ services, vehicles }: UpcomingServicesProps) => {
         ) : (
           <div className="py-8 text-center text-gray-500">
             <p>Brak zaplanowanych serwisów.</p>
-            <Link to="/services/new" className="mt-2 text-sm text-brand-600 hover:underline inline-block">
+            <Link to="/services/new" className="mt-2 text-sm text-red-600 hover:underline inline-block">
               Zaplanuj serwis
             </Link>
           </div>

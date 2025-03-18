@@ -13,10 +13,10 @@
   transition: filter 300ms;
 }
 .logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+  filter: drop-shadow(0 0 2em #ff4d4daa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop-shadow(0 0 2em #ff4d4daa);
 }
 
 @keyframes logo-spin {
@@ -48,7 +48,7 @@
 }
 
 .nav-link-active {
-  @apply bg-brand-50 text-brand-600;
+  @apply bg-red-50 text-red-600;
 }
 
 .mobile-nav-link {
