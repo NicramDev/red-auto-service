@@ -1,9 +1,8 @@
-
 import { useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import Navbar from '@/components/layout/Navbar';
 import PageHeader from '@/components/layout/PageHeader';
-import { getVehicleById, getServicesByVehicleId, getTagById, deleteVehicle } from '@/lib/data';
+import { getVehicleById, getServicesByVehicleId, getTagById, deleteVehicle, deleteService } from '@/lib/data';
 import { ServiceRecord } from '@/lib/types';
 import ServiceCard from '@/components/services/ServiceCard';
 import { Button } from '@/components/ui/button';
@@ -26,9 +25,10 @@ const VehicleDetails = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
   
   const vehicle = id ? getVehicleById(id) : undefined;
-  const services = id ? getServicesByVehicleId(id) : [];
+  const [services, setServices] = useState<ServiceRecord[]>(id ? getServicesByVehicleId(id) : []);
 
   if (!vehicle) {
     return (
@@ -43,7 +43,7 @@ const VehicleDetails = () => {
     );
   }
 
-  const handleDelete = () => {
+  const handleDeleteVehicle = () => {
     if (id) {
       deleteVehicle(id);
       toast({
@@ -52,6 +52,26 @@ const VehicleDetails = () => {
       });
       navigate('/vehicles');
     }
+  };
+
+  const handleDeleteService = (serviceId: string) => {
+    setServiceToDelete(serviceId);
+  };
+  
+  const confirmDeleteService = () => {
+    if (serviceToDelete) {
+      deleteService(serviceToDelete);
+      setServices(services.filter(s => s.id !== serviceToDelete));
+      toast({
+        title: "Serwis usunięty",
+        description: "Serwis został usunięty pomyślnie.",
+      });
+      setServiceToDelete(null);
+    }
+  };
+  
+  const cancelDeleteService = () => {
+    setServiceToDelete(null);
   };
 
   const handleViewAttachment = () => {
@@ -73,14 +93,14 @@ const VehicleDetails = () => {
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-12">
         <PageHeader
-          title={`${vehicle.brand} ${vehicle.customName}`}
+          title={`${vehicle?.brand} ${vehicle?.customName}`}
           description={`Szczegóły pojazdu i historia serwisowa`}
         >
           <div className="flex gap-2">
             <Button
               variant="outline"
               className="gap-1"
-              onClick={() => navigate(`/vehicles/edit/${id}`)}
+              onClick={() => navigate(`/vehicles/${id}/edit`)}
             >
               <Pencil className="h-4 w-4" />
               Edytuj
@@ -197,7 +217,6 @@ const VehicleDetails = () => {
                     <dd className="mt-1 text-sm text-gray-900">{vehicle.lastService || 'Brak'}</dd>
                   </div>
                   
-                  {/* Display attachment if available */}
                   {vehicle.attachment && vehicle.attachmentName && (
                     <div>
                       <dt className="text-sm font-medium text-gray-500">Załącznik</dt>
@@ -224,7 +243,13 @@ const VehicleDetails = () => {
             <h2 className="text-xl font-semibold mb-4">Historia serwisowa</h2>
             <div className="space-y-4">
               {services.map((service: ServiceRecord, index: number) => (
-                <ServiceCard key={service.id} service={service} vehicle={vehicle} index={index} />
+                <ServiceCard 
+                  key={service.id} 
+                  service={service} 
+                  vehicle={vehicle} 
+                  index={index}
+                  onDelete={() => handleDeleteService(service.id)}
+                />
               ))}
             </div>
           </div>
@@ -236,13 +261,31 @@ const VehicleDetails = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Potwierdzenie usunięcia</AlertDialogTitle>
             <AlertDialogDescription>
-              Czy na pewno chcesz usunąć pojazd {vehicle.brand} {vehicle.customName}? 
+              Czy na pewno chcesz usunąć pojazd {vehicle?.brand} {vehicle?.customName}? 
               Ta operacja jest nieodwracalna.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Anuluj</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-500 hover:bg-red-600">
+            <AlertDialogAction onClick={handleDeleteVehicle} className="bg-red-500 hover:bg-red-600">
+              Usuń
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+      
+      <AlertDialog open={!!serviceToDelete} onOpenChange={() => setServiceToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Potwierdzenie usunięcia serwisu</AlertDialogTitle>
+            <AlertDialogDescription>
+              Czy na pewno chcesz usunąć ten serwis?
+              Ta operacja jest nieodwracalna.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={cancelDeleteService}>Anuluj</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteService} className="bg-red-500 hover:bg-red-600">
               Usuń
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -1,6 +1,5 @@
-
 import { v4 as uuidv4 } from 'uuid';
-import { Vehicle, ServiceRecord, ServicePart, Tag } from './types';
+import { Vehicle, ServiceRecord, ServicePart, Tag, ServiceType, ServiceStatus } from './types';
 
 // Storage keys for localStorage
 const STORAGE_KEYS = {
@@ -55,7 +54,7 @@ const initialVehicles: Vehicle[] = [
     transmission: 'automatic',
     dateAdded: '2023-03-20',
     lastService: '2023-11-15',
-    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/MAN_TGX_18.480_BLS_%284th_gen._%2C_since_2020%29_IMG_1787.jpg/640px-MAN_TGX_18.480_BLS_%284th_gen._%2C_since_2020%29_IMG_1787.jpg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/MAN_TGX_18.4480_BLS_%284th_gen._%2C_since_2020%29_IMG_1787.jpg/640px-MAN_TGX_18.4480_BLS_%284th_gen._%2C_since_2020%29_IMG_1787.jpg',
     purchaseDate: '2018-05-10',
     insuranceStartDate: '2023-05-10',
     insuranceEndDate: '2024-05-10',
@@ -237,8 +236,8 @@ const loadStoredData = () => {
           date: '2024-01-10',
           time: '14:30',
           description: 'Wymiana klocków hamulcowych',
-          serviceType: 'repair' as const,
-          status: 'completed' as const,
+          serviceType: 'repair' as ServiceType,
+          status: 'completed' as ServiceStatus,
           cost: 600,
           notes: 'Klocki wymienione na nowe',
           parts: [
@@ -252,8 +251,8 @@ const loadStoredData = () => {
           date: '2024-01-15',
           time: '09:00',
           description: 'Przegląd techniczny',
-          serviceType: 'inspection' as const,
-          status: 'completed' as const,
+          serviceType: 'inspection' as ServiceType,
+          status: 'completed' as ServiceStatus,
           cost: 200,
           notes: 'Przegląd przeszedł pomyślnie',
           parts: [],
@@ -265,8 +264,8 @@ const loadStoredData = () => {
           date: '2024-01-20',
           time: '11:00',
           description: 'Naprawa klimatyzacji',
-          serviceType: 'repair' as const,
-          status: 'completed' as const,
+          serviceType: 'repair' as ServiceType,
+          status: 'completed' as ServiceStatus,
           cost: 800,
           notes: 'Uzupełnienie czynnika chłodniczego',
           parts: [
@@ -280,8 +279,8 @@ const loadStoredData = () => {
           date: '2024-01-25',
           time: '13:00',
           description: 'Wymiana opon',
-          serviceType: 'maintenance' as const,
-          status: 'completed' as const,
+          serviceType: 'maintenance' as ServiceType,
+          status: 'completed' as ServiceStatus,
           cost: 1200,
           notes: 'Opony zimowe',
           parts: [
@@ -295,8 +294,8 @@ const loadStoredData = () => {
           date: '2024-02-10',
           time: '16:00',
           description: 'Serwis olejowy',
-          serviceType: 'maintenance' as const,
-          status: 'scheduled' as const,
+          serviceType: 'maintenance' as ServiceType,
+          status: 'scheduled' as ServiceStatus,
           cost: 480,
           notes: 'Wymiana oleju i filtrów',
           parts: [
@@ -312,8 +311,8 @@ const loadStoredData = () => {
           date: '2024-02-15',
           time: '08:30',
           description: 'Kontrola zawieszenia',
-          serviceType: 'inspection' as const,
-          status: 'scheduled' as const,
+          serviceType: 'inspection' as ServiceType,
+          status: 'scheduled' as ServiceStatus,
           cost: 150,
           notes: 'Sprawdzenie stanu zawieszenia',
           parts: [],
@@ -325,8 +324,8 @@ const loadStoredData = () => {
           date: '2024-02-20',
           time: '10:00',
           description: 'Wymiana rozrządu',
-          serviceType: 'repair' as const,
-          status: 'scheduled' as const,
+          serviceType: 'repair' as ServiceType,
+          status: 'scheduled' as ServiceStatus,
           cost: 1500,
           notes: 'Wymiana kompletnego zestawu rozrządu',
           parts: [
@@ -341,8 +340,8 @@ const loadStoredData = () => {
           date: '2024-02-25',
           time: '14:00',
           description: 'Naprawa układu hamulcowego',
-          serviceType: 'repair' as const,
-          status: 'scheduled' as const,
+          serviceType: 'repair' as ServiceType,
+          status: 'scheduled' as ServiceStatus,
           cost: 750,
           notes: 'Wymiana tarcz i klocków hamulcowych',
           parts: [
@@ -357,8 +356,8 @@ const loadStoredData = () => {
           date: '2024-03-01',
           time: '12:00',
           description: 'Przegląd klimatyzacji',
-          serviceType: 'inspection' as const,
-          status: 'scheduled' as const,
+          serviceType: 'inspection' as ServiceType,
+          status: 'scheduled' as ServiceStatus,
           cost: 300,
           notes: 'Sprawdzenie szczelności i uzupełnienie czynnika',
           parts: [],
@@ -582,3 +581,4 @@ export const deleteVehicleWithStorage = deleteVehicle;
 export const addServiceWithStorage = addService;
 export const updateServiceWithStorage = updateService;
 export const addTagWithStorage = addTag;
+

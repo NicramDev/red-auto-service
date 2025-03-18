@@ -1,7 +1,7 @@
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useEffect } from 'react';
-import { PageTransition } from './components/ui/PageTransition';
+import PageTransition from './components/ui/PageTransition';
 import { Toaster } from './components/ui/toaster';
 import { useToast } from './hooks/use-toast';
 
