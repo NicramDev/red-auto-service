@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from 'uuid';
 import { Vehicle, ServiceRecord, Tag, ServiceType, ServiceStatus } from './types';
 
@@ -35,7 +34,8 @@ export const vehicles: Vehicle[] = [
     fuelCardNumber: 'FC123456',
     gpsSystemNumber: 'GPS789012',
     image: 'https://i.imgur.com/uoSDRGP.jpg',
-    tags: ['1', '3']
+    tags: ['1', '3'],
+    dateAdded: '2020-03-10'
   },
   {
     id: '2',
@@ -56,7 +56,8 @@ export const vehicles: Vehicle[] = [
     fuelCardNumber: 'FC654321',
     gpsSystemNumber: 'GPS210987',
     image: 'https://i.imgur.com/zJFrViY.jpg',
-    tags: ['2', '5']
+    tags: ['2', '5'],
+    dateAdded: '2021-02-15'
   },
   {
     id: '3',
@@ -77,7 +78,8 @@ export const vehicles: Vehicle[] = [
     fuelCardNumber: 'FC987654',
     gpsSystemNumber: 'GPS345678',
     image: 'https://i.imgur.com/yvLvtrc.jpg',
-    tags: ['1', '4']
+    tags: ['1', '4'],
+    dateAdded: '2019-11-20'
   }
 ];
 
